@@ -1,0 +1,108 @@
+project: Magento Apache Alpine Image build
+version: 0.1.0
+
+#
+# Init builder
+#
+general:
+  envvars:
+    keys:
+      True: "True"
+      false: "False"
+      dev: "dev"
+      prd: "prd"
+    
+#
+# Build process
+# Creates dockerfile and file used in it
+#
+build:
+  import:
+    - "templates"
+  envvars:
+    env:
+      valueFromFile: "./env"
+    # Apache
+    apache:
+      port:
+        dev: 80
+        prd: 443
+    # PHP
+    php:
+      version:
+        valueFromFile: "./php-version"
+      major:
+        version:
+          valueFromCommand: "echo $BUILD_PHP_VERSION | cut -d \\. -f 1"
+
+    # Docker
+    dockerfile:
+      image: 'alpine:latest'
+      ports:
+        main: 
+          valueFromCommand: '[ "$BUILD_ENV" = "$GENERAL_KEYS_DEV" ] && echo "$BUILD_APACHE_PORT_DEV" || echo "$BUILD_APACHE_PORT_PRD"'
+      entrypoint: /bin/sh", "-c
+      cmd: /usr/sbin/httpd -D FOREGROUND -f /etc/apache2/httpd.conf
+
+
+#
+# Setup process injected in dockerfile
+#
+setup:
+  # Setup env 
+  envvars:
+    php:
+      install: True
+  # Setup Processes
+  processes:
+    - title: "Install apache webserver"
+      commands: 
+        - "apk --no-cache add apache2 apache2-utils apache2-proxy apache2-ssl"
+    - title: "Install php fpm"
+      commands: 
+        - "apk --no-cache add php${BUILD_PHP_MAJOR_VERSION}-fpm"
+
+#
+# Config process run just before the entrypoint
+#
+config:
+  # Config env 
+  envvars:
+    php:
+      fpm:
+        host: "php-fpm.service"
+        port: 9000
+  processes:
+    - title: "Configure Apache"
+      commands:
+        - while read line; do eval echo \"$line\"; done < /usr/local/templates/apache_fpm_server_conf.template > /etc/apache2/conf.d/zzz_server.conf
+
+    - title: "Configure apache to proxy php files to the php-fpm service"
+      commands:
+        - while read line; do eval echo \"$line\"; done < /usr/local/templates/php_fpm_conf.template > "/etc/php${BUILD_PHP_MAJOR_VERSION}/php-fpm.d/zzz.conf"
+
+test:
+  envvars:
+    port: 30000
+    dockerfile:
+      tag: 
+        user: 03192859189254
+        name: docker-magento-apache-alpine
+        version: 'latest'
+  processes:
+    - title: "Starting container"
+      commands:
+        - TEST_CONTAINER_ID=$(docker run -d -p 127.0.0.1:${TEST_PORT}:${BUILD_DOCKERFILE_PORTS_MAIN} ${TEST_DOCKERFILE_TAG_USER}/${TEST_DOCKERFILE_TAG_NAME}:${TEST_DOCKERFILE_TAG_VERSION})
+
+    - title: "Injecting test file"
+      commands:
+        - docker exec $TEST_CONTAINER_ID /bin/sh -c "echo '<html><head></head><body>test</body></html>' > /var/www/html/test.html"
+
+    - title: "Testing"
+      shell_condition: "$CONFIG_PHP_EXT_XDEBUG = $GENERAL_KEYS_TRUE"
+      commands:
+        - curl 127.0.0.1:${TEST_PORT}/test.html -f
+
+    - title: "Cleaning"
+      commands:
+        - docker exec $TEST_CONTAINER_ID /bin/sh -c "rm /var/www/html/test.html"
