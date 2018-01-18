@@ -12,7 +12,7 @@ before_install:
 script:
 # Starting httpd container
  - CURDIR=$(pwd)
- - TEST_HTTPD_CONTAINER_ID=$( docker run -d --name=docker-magento-apache-alpine -e CONFIG_HTTPD_DOCUMENT_ROOT=/var/www/html -e CONFIG_PHP_FPM_HOST=127.0.0.1 -v $CURDIR/volumes/test_webroot:/var/www/html" -p 30000:443 03192859189254/docker-magento-apache-alpine:latest )
+ - TEST_HTTPD_CONTAINER_ID=$( docker run -d --name=docker-magento-apache-alpine -e CONFIG_HTTPD_DOCUMENT_ROOT=/var/www/html -e CONFIG_PHP_FPM_HOST=127.0.0.1 -v $CURDIR/volumes/test_webroot:/var/www/html -p 30000:443 03192859189254/docker-magento-apache-alpine:latest )
  - TEST_HTTPD_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_HTTPD_CONTAINER_ID)
 
 # Testing httpd container
@@ -23,7 +23,7 @@ script:
     fi
 # Running PHP-FPM container
  - if [ True = True ]; then
-        TEST_PHP_CONTAINER_ID=$( docker run -d --net=container:docker-magento-apache-alpine -v $CURDIR/volumes/test_webroot:/var/www/html" quay.io/alphasocket/docker-magento-php-fpm-alpine:7.0 )
+        TEST_PHP_CONTAINER_ID=$( docker run -d --net=container:docker-magento-apache-alpine -v $CURDIR/volumes/test_webroot:/var/www/html quay.io/alphasocket/docker-magento-php-fpm-alpine:7.0 )
         TEST_PHP_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_PHP_CONTAINER_ID)
     fi
 # Testing PHP-FPM container
