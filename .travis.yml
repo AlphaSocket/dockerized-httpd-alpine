@@ -1,7 +1,5 @@
 sudo: required
 
-language: python
-
 services:
   - docker
 
@@ -17,7 +15,7 @@ script:
 
 # Testing httpd container
  - if [ ! "$TEST_HTTPD_CONTAINER_STATUS" == "true" ]; then
-        echo -ne "Httpd container failed, print logs and exiting\n"
+        echo -ne "Httpd container failed, print logs and exiting"
         docker logs $TEST_HTTPD_CONTAINER_ID
         exit 1
     fi
@@ -28,7 +26,7 @@ script:
     fi
 # Testing PHP-FPM container
  - if [ ! "$TEST_PHP_CONTAINER_STATUS" = "true" ]; then
-        echo -ne "PHP-FPM container failed, print logs and exiting\n"
+        echo -ne "PHP-FPM container failed, print logs and exiting"
         docker logs $TEST_PHP_CONTAINER_ID
         exit 1
     fi
@@ -41,7 +39,7 @@ script:
     fi
 # Checking exit code
  - if [ ! "$HTTP_CODE" == "200" ]; then
-        echo -ne "### Test failed, received HTTP code ${HTTP_CODE} printing log\n"
+        echo -ne "### Test failed, received HTTP code ${HTTP_CODE} printing log"
         docker logs $TEST_APACHE_CONTAINER_ID
         exit 1
     fi
@@ -53,7 +51,7 @@ script:
 
 after_success:
   - if [ "$DOCKER_USERNAME" ]; then
-    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" $DOCKER_REGISTER;
-    docker tag 03192859189254/dockerized-apache-alpine:latest-dev ${DOCKER_REGISTER}/${DOCKER_USERNAME}/dockerized-apache-alpine:latest-dev;
-    docker push ${DOCKER_REGISTER}/${DOCKER_USERNAME}/dockerized-apache-alpine:latest-dev;
+        docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" $DOCKER_REGISTER;
+        docker tag 03192859189254/dockerized-apache-alpine:latest-dev ${DOCKER_REGISTER}/${DOCKER_USERNAME}/dockerized-apache-alpine:latest-dev;
+        docker push ${DOCKER_REGISTER}/${DOCKER_USERNAME}/dockerized-apache-alpine:latest-dev;
     fi
