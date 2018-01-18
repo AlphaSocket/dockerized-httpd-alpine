@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+
+# exit if a command fails
+set -e
+
+# Enable required modules
+sed -i '/LoadModule.*rewrite_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
+sed -i '/LoadModule.*logio_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
+
+# Setup optional conf folders
+mkdir $SETUP_HTTPD_CONF_CONFD
+echo -ne "\nIncludeOptional $SETUP_HTTPD_CONF_CONFD/*.conf\n" >> $SETUP_HTTPD_CONF_MAIN
+mkdir $SETUP_HTTPD_CONF_VHOSTD
+echo -ne "\nIncludeOptional $SETUP_HTTPD_CONF_VHOSTD/*.conf\n" >> $SETUP_HTTPD_CONF_MAIN
+
+# Enable Production required modules
+if [ "$BUILD_ENV" = "$GENERAL_KEYS_PRD" ]; then
+    sed -i '/LoadModule.*ssl_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
+fi
+
+# Enable PHP FPM required modules
+if [ "$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE" ]; then
+    sed -i '/LoadModule.*proxy_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
+    sed -i '/LoadModule.*proxy_fcgi_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
+fi
+
+
+
+exit 0
