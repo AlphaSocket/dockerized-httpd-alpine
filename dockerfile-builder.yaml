@@ -162,7 +162,7 @@ test:
     port: 30000
     dockerfile:
       volumes:
-        webroot: volumes/test_webroot:$CONFIG_HTTPD_DOCUMENT_ROOT"
+        webroot: volumes/test_webroot:$CONFIG_HTTPD_DOCUMENT_ROOT
       tag: 
         user: 03192859189254
         name: $BUILD_NAME
