@@ -19,20 +19,20 @@ script:
     echo -ne "Httpd container failed, print logs and exiting \n" \
     docker logs $TEST_HTTPD_CONTAINER_ID \
     exit 1 \
-fi
+    fi
 
 # Running PHP-FPM container
  - if [ True = True ]; then \
     TEST_PHP_CONTAINER_ID=$( docker run -d --net=container:docker-magento-apache-alpine -v /home/sam/Projects/Docker/docker-magento-apache-alpine/volumes/test_webroot:/var/www/html quay.io/alphasocket/docker-magento-php-fpm-alpine:7.0 ) \
     TEST_PHP_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_PHP_CONTAINER_ID) \
-fi
+    fi
 
 # Testing PHP-FPM container
  - if [ ! "$TEST_PHP_CONTAINER_STATUS" = "true" ]; then \
     echo -ne "PHP-FPM container failed, print logs and exiting \n" \
     docker logs $TEST_PHP_CONTAINER_ID \
     exit 1 \
-fi
+    fi
 
 # Testing httpd
  - HTTP_CODE=$(curl -sLI 127.0.0.1:30000/index.html -o /dev/null -w '%{http_code}\n' )
@@ -40,19 +40,19 @@ fi
 # Testing PHP service
  - if [ True = True ]; then
     HTTP_CODE=$(curl -sLI 127.0.0.1:30000/index.php -o /dev/null -w '%{http_code}\n' )
-fi
+    fi
 
 # Checking exit code
  - if [ ! "$HTTP_CODE" == "200" ]; then \
     echo -ne "\n### Test failed, received HTTP code ${HTTP_CODE} printing log \n\n" \
     docker logs $TEST_APACHE_CONTAINER_ID \
     exit 1 \
-fi
+    fi
 
 # Print success
  - if [ "$HTTP_CODE" == "200" ]; then \
     echo -ne "\n### Test succeeded\n" \
-fi
+    fi
 
 
 
