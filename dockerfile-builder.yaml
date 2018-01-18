@@ -189,7 +189,7 @@ test:
     - title: "Testing httpd container"
       shell_condition: '! "$TEST_HTTPD_CONTAINER_STATUS" == "true"'
       commands:
-        - echo -ne "Httpd container failed, print logs and exiting\n"
+        - echo -ne "Httpd container failed, print logs and exiting"
         - docker logs $TEST_HTTPD_CONTAINER_ID
         - exit 1
         
@@ -212,7 +212,7 @@ test:
       shell_condition: $SETUP_PHP_FPM = $GENERAL_KEYS_TRUE
       shell_condition: '! "$TEST_PHP_CONTAINER_STATUS" = "true"'
       commands:
-        - echo -ne "PHP-FPM container failed, print logs and exiting\n"
+        - echo -ne "PHP-FPM container failed, print logs and exiting"
         - docker logs $TEST_PHP_CONTAINER_ID
         - exit 1
 
@@ -234,7 +234,7 @@ test:
     - title: "Checking exit code"
       shell_condition: '! "$HTTP_CODE" == "200"'
       commands:
-        - echo -ne "### Test failed, received HTTP code ${HTTP_CODE} printing log\n" 
+        - echo -ne "### Test failed, received HTTP code ${HTTP_CODE} printing log" 
         - docker logs $TEST_APACHE_CONTAINER_ID
         - exit 1
 
