@@ -4,7 +4,7 @@
 FROM httpd:alpine
 
 ENV \
-	BUILD_NAME="docker-magento-apache-alpine" \
+	BUILD_NAME="dockerized-apache-alpine" \
 	BUILD_BRANCH="latest-dev" \
 	BUILD_VERSION="latest" \
 	BUILD_ENV="dev" \
@@ -24,7 +24,7 @@ ENV \
 	CONFIG_PATHS_CONF_HTTPD_SERVER="/usr/local/apache2/conf/conf.d/10-server.conf" \
 	CONFIG_PATHS_CONF_HTTPD_SSL="/usr/local/apache2/conf/conf.d/10-ssl.conf" \
 	CONFIG_PATHS_CONF_HTTPD_FASTCGI="/usr/local/apache2/conf/conf.d/20-fastcgi.conf" \
-	CONFIG_HTTPD_SERVERNAME="docker-magento-apache-alpine" \
+	CONFIG_HTTPD_SERVERNAME="dockerized-apache-alpine" \
 	CONFIG_HTTPD_TIMEOUT="1000" \
 	CONFIG_HTTPD_DOCUMENT_ROOT="/var/www/html" \
 	CONFIG_HTTPD_DOCUMENT_INDEX="index.php" \
