@@ -7,28 +7,28 @@ services:
 
 before_install:
   - sudo apt update && sudo apt install curl libfcgi0ldbl -y
-  - docker build -t 03192859189254/docker-magento-apache-alpine:latest .
+  - docker build -t 03192859189254/dockerized-apache-alpine:latest .
 
 script:
 # Starting httpd container
  - CURDIR=$(pwd)
- - TEST_HTTPD_CONTAINER_ID=$( docker run -d --name=docker-magento-apache-alpine -e CONFIG_HTTPD_DOCUMENT_ROOT=/var/www/html -e CONFIG_PHP_FPM_HOST=127.0.0.1 -v $CURDIR/volumes/test_webroot:/var/www/html -p 30000:443 03192859189254/docker-magento-apache-alpine:latest )
+ - TEST_HTTPD_CONTAINER_ID=$( docker run -d --name=dockerized-apache-alpine -e CONFIG_HTTPD_DOCUMENT_ROOT=/var/www/html -e CONFIG_PHP_FPM_HOST=127.0.0.1 -v $CURDIR/volumes/test_webroot:/var/www/html -p 30000:443 03192859189254/dockerized-apache-alpine:latest )
  - TEST_HTTPD_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_HTTPD_CONTAINER_ID)
 
 # Testing httpd container
  - if [ ! "$TEST_HTTPD_CONTAINER_STATUS" == "true" ]; then
-        echo -ne "Httpd container failed, print logs and exiting \n"
+        echo -ne "Httpd container failed, print logs and exiting\n"
         docker logs $TEST_HTTPD_CONTAINER_ID
         exit 1
     fi
 # Running PHP-FPM container
  - if [ True = True ]; then
-        TEST_PHP_CONTAINER_ID=$( docker run -d --net=container:docker-magento-apache-alpine -v $CURDIR/volumes/test_webroot:/var/www/html quay.io/alphasocket/docker-magento-php-fpm-alpine:7.0 )
+        TEST_PHP_CONTAINER_ID=$( docker run -d --net=container:dockerized-apache-alpine -v $CURDIR/volumes/test_webroot:/var/www/html quay.io/alphasocket/docker-magento-php-fpm-alpine:7.0 )
         TEST_PHP_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_PHP_CONTAINER_ID)
     fi
 # Testing PHP-FPM container
  - if [ ! "$TEST_PHP_CONTAINER_STATUS" = "true" ]; then
-        echo -ne "PHP-FPM container failed, print logs and exiting \n"
+        echo -ne "PHP-FPM container failed, print logs and exiting\n"
         docker logs $TEST_PHP_CONTAINER_ID
         exit 1
     fi
@@ -41,19 +41,19 @@ script:
     fi
 # Checking exit code
  - if [ ! "$HTTP_CODE" == "200" ]; then
-        echo -ne "\n### Test failed, received HTTP code ${HTTP_CODE} printing log \n\n"
+        echo -ne "### Test failed, received HTTP code ${HTTP_CODE} printing log\n"
         docker logs $TEST_APACHE_CONTAINER_ID
         exit 1
     fi
 # Print success
  - if [ "$HTTP_CODE" == "200" ]; then
-        echo -ne "\n### Test succeeded\n"
+        echo -ne "### Test succeeded\n"
     fi
 
 
 after_success:
   - if [ "$DOCKER_USERNAME" ]; then
     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" $DOCKER_REGISTER;
-    docker tag 03192859189254/docker-magento-apache-alpine:latest ${DOCKER_REGISTER}/${DOCKER_USERNAME}/docker-magento-apache-alpine:latest;
-    docker push ${DOCKER_REGISTER}/${DOCKER_USERNAME}/docker-magento-apache-alpine:latest;
+    docker tag 03192859189254/dockerized-apache-alpine:latest ${DOCKER_REGISTER}/${DOCKER_USERNAME}/dockerized-apache-alpine:latest;
+    docker push ${DOCKER_REGISTER}/${DOCKER_USERNAME}/dockerized-apache-alpine:latest;
     fi
