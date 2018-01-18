@@ -1,5 +1,7 @@
-project: Magento Apache Alpine Image build
-version: 0.1.0
+project:
+  title: &project_title Magento Apache Alpine Image build
+  codename: &project_codename docker-magento-apache-alpine
+  version: &project_version 0.1.0
 
 #
 # Init builder
@@ -18,31 +20,28 @@ general:
 #
 build:
   import:
-    - "templates"
+    - "templates:/usr/local/templates"
   envvars:
+    name: *project_codename
+    branch:
+      valueFromCommand: 'git rev-parse --abbrev-ref HEAD'
+    version:
+      valueFromCommand: 'echo $BUILD_BRANCH | cut -d \- -f 1'
     env:
-      valueFromFile: "./env"
+      valueFromCommand: 'env=$(echo $BUILD_BRANCH | cut -d \- -f 2); [ "$env" = "$BUILD_VERSION" ] && echo $GENERAL_KEYS_PRD || echo $env'
     # Apache
     apache:
       port:
         dev: 80
         prd: 443
-    # PHP
-    php:
-      version:
-        valueFromFile: "./php-version"
-      major:
-        version:
-          valueFromCommand: "echo $BUILD_PHP_VERSION | cut -d \\. -f 1"
-
     # Docker
     dockerfile:
-      image: 'alpine:latest'
+      image: 'httpd:alpine'
       ports:
         main: 
           valueFromCommand: '[ "$BUILD_ENV" = "$GENERAL_KEYS_DEV" ] && echo "$BUILD_APACHE_PORT_DEV" || echo "$BUILD_APACHE_PORT_PRD"'
-      entrypoint: /bin/sh", "-c
-      cmd: /usr/sbin/httpd -D FOREGROUND -f /etc/apache2/httpd.conf
+      # cmd: /usr/sbin/httpd -D FOREGROUND -f /etc/apache2/httpd.conf
+      cmd: httpd-foreground
 
 
 #
@@ -51,16 +50,52 @@ build:
 setup:
   # Setup env 
   envvars:
+    httpd:
+      conf:
+        path: /usr/local/apache2/conf
+        #main: /etc/apache2/httpd.conf
+        main: ${SETUP_HTTPD_CONF_PATH}/httpd.conf
+        confd: ${SETUP_HTTPD_CONF_PATH}/conf.d
+        vhostd: ${SETUP_HTTPD_CONF_PATH}/vhost.d
     php:
-      install: True
+      fpm: True
   # Setup Processes
   processes:
-    - title: "Install apache webserver"
-      commands: 
-        - "apk --no-cache add apache2 apache2-utils apache2-proxy apache2-ssl"
-    - title: "Install php fpm"
-      commands: 
-        - "apk --no-cache add php${BUILD_PHP_MAJOR_VERSION}-fpm"
+
+    # - title: "Install apache webserver"
+    #   commands: 
+    #     #- "apk --no-cache add apache2 apache2-utils apache2-proxy apache2-ssl apache-mod-fcgid"
+    #     - apk --no-cache add 
+
+    - title: "Enable required modules"
+      commands:
+        # Enable rewrite_module
+        - sed -i '/LoadModule.*rewrite_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
+        # Enable logio_module
+        - sed -i '/LoadModule.*logio_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
+
+    - title: "Setup optional conf folders"
+      commands:
+        # Add conf.d folder
+        - mkdir $SETUP_HTTPD_CONF_CONFD
+        - echo -ne "\nIncludeOptional $SETUP_HTTPD_CONF_CONFD/*.conf\n" >> $SETUP_HTTPD_CONF_MAIN
+        # Add vhost.d folder
+        - mkdir $SETUP_HTTPD_CONF_VHOSTD
+        - echo -ne "\nIncludeOptional $SETUP_HTTPD_CONF_VHOSTD/*.conf\n" >> $SETUP_HTTPD_CONF_MAIN
+
+    - title: "Enable Production required modules"
+      shell_condition: '"$BUILD_ENV" = "$GENERAL_KEYS_PRD"'
+      commands:
+        # Enable ssl_module
+        - sed -i '/LoadModule.*ssl_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
+
+    - title: "Enable PHP FPM required modules"
+      shell_condition: '"$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE"'
+      commands:
+        # Enable proxy_module
+        - sed -i '/LoadModule.*proxy_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
+        # Enable proxy_fcgi_module
+        - sed -i '/LoadModule.*proxy_fcgi_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
 
 #
 # Config process run just before the entrypoint
@@ -68,41 +103,142 @@ setup:
 config:
   # Config env 
   envvars:
+    paths:
+      templates:
+        httpd:
+          server: /usr/local/templates/10-server.conf
+          ssl: /usr/local/templates/10-ssl.conf
+          fastcgi: /usr/local/templates/20-fastcgi.conf
+      conf:
+        httpd:
+          server: ${SETUP_HTTPD_CONF_CONFD}/10-server.conf
+          ssl: ${SETUP_HTTPD_CONF_CONFD}/10-ssl.conf
+          fastcgi: ${SETUP_HTTPD_CONF_CONFD}/20-fastcgi.conf
+    httpd:
+      servername: *project_codename
+      timeout: 1000
+      document:
+        root: /var/www/html
+        index: index.php
+        options: FollowSymLinks
     php:
+      proxy:
+        timeout: 100
+        regex: .+\.ph(p[3457]?|t|tml)$
       fpm:
         host: "php-fpm.service"
+        #host: 127.0.0.1
         port: 9000
+          
   processes:
-    - title: "Configure Apache"
+    - title: "Make sure webroot exists"
       commands:
-        - while read line; do eval echo \"$line\"; done < /usr/local/templates/apache_fpm_server_conf.template > /etc/apache2/conf.d/zzz_server.conf
+        - "mkdir -p ${CONFIG_HTTPD_DOCUMENT_ROOT}"
 
-    - title: "Configure apache to proxy php files to the php-fpm service"
+    - title: "Create server conf"
       commands:
-        - while read line; do eval echo \"$line\"; done < /usr/local/templates/php_fpm_conf.template > "/etc/php${BUILD_PHP_MAJOR_VERSION}/php-fpm.d/zzz.conf"
+       - cp $CONFIG_PATHS_TEMPLATES_HTTPD_SERVER $CONFIG_PATHS_CONF_HTTPD_SERVER
 
+    - title: "Create Production configurations"
+      shell_condition: '"$BUILD_ENV" = "$GENERAL_KEYS_PRD"'
+      commands:
+        # Enable ssl_module
+       - cp $CONFIG_PATHS_TEMPLATES_HTTPD_SSL $CONFIG_PATHS_CONF_HTTPD_SSL
+
+    - title: "Create fastcgi conf"
+      shell_condition: '"$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE"'
+      commands:
+       #- while read line; do eval echo \"$line\"; done < $HTTPD_FAST_CGI_CONF_TEMPLATE_PATH >> $HTTPD_FAST_CGI_CONF_PATH
+
+       #- sed -i -e 's/<PHP_FPM_HOST>/'$CONFIG_PHP_FPM_HOST'/g' $HTTPD_FAST_CGI_CONF_PATH
+       #- sed -i -e 's/<PHP_FPM_PORT>/'$CONFIG_PHP_FPM_PORT'/g' $HTTPD_FAST_CGI_CONF_PATH
+       #- sed -i -e 's/<PHP_PROXY_REGEX>/'${CONFIG_PHP_PROXY_REGEX}'/g' $HTTPD_FAST_CGI_CONF_PATH
+       #- sed -i -e 's/<PHP_PROXY_TIMEOUT>/'${CONFIG_PHP_PROXY_TIMEOUT}'/g' $HTTPD_FAST_CGI_CONF_PATH
+       - cp $CONFIG_PATHS_TEMPLATES_HTTPD_FASTCGI $CONFIG_PATHS_CONF_HTTPD_FASTCGI
+       
 test:
   envvars:
+    name: *project_codename
     port: 30000
     dockerfile:
+      volumes:
+        webroot: 
+          valueFromCommand: "echo $(realpath ./volumes)/test_webroot:$CONFIG_HTTPD_DOCUMENT_ROOT"
       tag: 
         user: 03192859189254
-        name: docker-magento-apache-alpine
-        version: 'latest'
+        name: $BUILD_NAME
+        version: $BUILD_BRANCH
   processes:
-    - title: "Starting container"
-      commands:
-        - TEST_CONTAINER_ID=$(docker run -d -p 127.0.0.1:${TEST_PORT}:${BUILD_DOCKERFILE_PORTS_MAIN} ${TEST_DOCKERFILE_TAG_USER}/${TEST_DOCKERFILE_TAG_NAME}:${TEST_DOCKERFILE_TAG_VERSION})
 
-    - title: "Injecting test file"
-      commands:
-        - docker exec $TEST_CONTAINER_ID /bin/sh -c "echo '<html><head></head><body>test</body></html>' > /var/www/html/test.html"
+    # 
+    # Run httpd
+    # 
+    - title: "Starting httpd container"
+      commands: 
+        - TEST_HTTPD_CONTAINER_ID=$(
+            docker run 
+              -d --name=$TEST_NAME
+              -e CONFIG_HTTPD_DOCUMENT_ROOT=${CONFIG_HTTPD_DOCUMENT_ROOT}
+              -e CONFIG_PHP_FPM_HOST=127.0.0.1
+              -v $TEST_DOCKERFILE_VOLUMES_WEBROOT
+              -p ${TEST_PORT}:${BUILD_DOCKERFILE_PORTS_MAIN}
+              ${TEST_DOCKERFILE_TAG_USER}/${TEST_DOCKERFILE_TAG_NAME}:${TEST_DOCKERFILE_TAG_VERSION} 
+          )
+        - TEST_HTTPD_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_HTTPD_CONTAINER_ID)
 
-    - title: "Testing"
-      shell_condition: "$CONFIG_PHP_EXT_XDEBUG = $GENERAL_KEYS_TRUE"
+    - title: "Testing httpd container"
+      shell_condition: '! "$TEST_HTTPD_CONTAINER_STATUS" == "true"'
       commands:
-        - curl 127.0.0.1:${TEST_PORT}/test.html -f
+        - echo -ne "Httpd container failed, print logs and exiting \n"
+        - docker logs $TEST_HTTPD_CONTAINER_ID
+        - exit 1
+        
+    # 
+    # Run php-fpm
+    # 
+    - title: "Running PHP-FPM container"
+      shell_condition: $SETUP_PHP_FPM = $GENERAL_KEYS_TRUE
+      commands: 
+        - TEST_PHP_CONTAINER_ID=$(
+            docker run 
+              -d --net=container:$TEST_NAME 
+              -v $TEST_DOCKERFILE_VOLUMES_WEBROOT
+              quay.io/alphasocket/docker-magento-php-fpm-alpine:7.0
+          )
 
-    - title: "Cleaning"
+        - TEST_PHP_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_PHP_CONTAINER_ID)
+
+    - title: "Testing PHP-FPM container"
+      shell_condition: $SETUP_PHP_FPM = $GENERAL_KEYS_TRUE
+      shell_condition: '! "$TEST_PHP_CONTAINER_STATUS" = "true"'
       commands:
-        - docker exec $TEST_CONTAINER_ID /bin/sh -c "rm /var/www/html/test.html"
+        - echo -ne "PHP-FPM container failed, print logs and exiting \n"
+        - docker logs $TEST_PHP_CONTAINER_ID
+        - exit 1
+
+    #
+    # TESTING
+    #
+    - title: "Testing httpd"
+      commands:
+        - HTTP_CODE=$(curl -sLI 127.0.0.1:${TEST_PORT}/index.html -o /dev/null -w '%{http_code}\n' )
+
+    - title: "Testing PHP service"
+      shell_condition: $SETUP_PHP_FPM = $GENERAL_KEYS_TRUE
+      commands:
+        # Injecting test
+        #- docker exec $TEST_APACHE_CONTAINER_ID /bin/sh -c "echo '<?php phpinfo(); ?>' > /usr/local/apache2/htdocs/index.php"
+        #- docker exec $TEST_PHP_CONTAINER_ID /bin/sh -c "echo '<?php phpinfo(); ?>' > /var/www/html/index.php"
+        - HTTP_CODE=$(curl -sLI 127.0.0.1:${TEST_PORT}/index.php -o /dev/null -w '%{http_code}\n' )
+        
+    - title: "Checking exit code"
+      shell_condition: '! "$HTTP_CODE" == "200"'
+      commands:
+        - echo -ne "\n### Test failed, received HTTP code ${HTTP_CODE} printing log \n\n" 
+        - docker logs $TEST_APACHE_CONTAINER_ID
+        - exit 1
+
+    - title: "Print success"
+      shell_condition: '"$HTTP_CODE" == "200"'
+      commands:
+        - echo -ne "\n### Test succeeded\n"

@@ -1,0 +1,117 @@
+project:
+  title: &project_title Magento Apache Alpine Image build
+  codename: &project_codename docker-magento-apache-alpine
+  version: &project_version 0.1.0
+
+#
+# Init builder
+#
+general:
+  envvars:
+    keys:
+      True: "True"
+      false: "False"
+      dev: "dev"
+      prd: "prd"
+    
+#
+# Build process
+# Creates dockerfile and file used in it
+#
+build:
+  import:
+    - "templates"
+  envvars:
+    name: *project_codename
+    branch:
+      valueFromCommand: 'git rev-parse --abbrev-ref HEAD'
+    version:
+      valueFromCommand: 'echo $BUILD_BRANCH | cut -d \- -f 1'
+    env:
+      valueFromCommand: 'env=$(echo $BUILD_BRANCH | cut -d \- -f 2); [ "$env" = "$BUILD_VERSION" ] && echo $GENERAL_KEYS_PRD || echo $env'
+    # Apache
+    apache:
+      port:
+        dev: 80
+        prd: 443
+    # Docker
+    dockerfile:
+      image: 'alpine:latest'
+      #image: 'httpd:alpine'
+      ports:
+        main: 
+          valueFromCommand: '[ "$BUILD_ENV" = "$GENERAL_KEYS_DEV" ] && echo "$BUILD_APACHE_PORT_DEV" || echo "$BUILD_APACHE_PORT_PRD"'
+      entrypoint: /bin/sh", "-c
+      cmd: /usr/sbin/httpd -D FOREGROUND -f /etc/apache2/httpd.conf
+
+
+#
+# Setup process injected in dockerfile
+#
+setup:
+  # Setup env 
+  envvars:
+    php:
+      install: True
+  # Setup Processes
+  processes:
+    - title: "Install apache webserver"
+      commands: 
+        - "apk --no-cache add apache2 apache2-utils apache2-proxy apache2-ssl apache-mod-fcgid"
+
+#
+# Config process run just before the entrypoint
+#
+config:
+  # Config env 
+  envvars:
+    php:
+      fpm:
+        host: "php-fpm.service"
+        port: 9000
+  processes:
+    - title: "Enable required modules"
+      commands:
+        - HTTPD_CONF_PATH=/etc/apache2/httpd.conf
+        # Enable rewrite_module
+        - sed -i '/LoadModule.*rewrite_module/ s/^#//' $HTTPD_CONF_PATH
+        # Enable proxy_module
+        - sed -i '/LoadModule.*proxy_module/ s/^#//' $HTTPD_CONF_PATH
+        # Enable proxy_fcgi_module
+        - sed -i '/LoadModule.*proxy_fcgi_module/ s/^#//' $HTTPD_CONF_PATH
+    
+    # - title: "Enable required modules"
+    #   commands:
+    #     - HTTPD_FAST_CGI_CONF_PATH=/usr/local/apache2/conf/extra/httpd-fastcgi.conf
+    #     - while read line; do eval echo \"$line\"; done < /usr/local/templates/apache_fpm_server_conf.template > HTTPD_FAST_CGI_CONF_PATH
+
+    # - title: "Configure apache to proxy php files to the php-fpm service"
+    #   commands:
+    #     - PHP_VERSION=5
+    #     - while read line; do eval echo \"$line\"; done < /usr/local/templates/php_fpm_conf.template >> $HTTPD_FAST_CGI_CONF_PATH
+    #     - PHP_VERSION=7
+    #     - while read line; do eval echo \"$line\"; done < /usr/local/templates/php_fpm_conf.template >> "/etc/php7/php-fpm.d/zzz.conf"
+
+test:
+  envvars:
+    port: 30000
+    dockerfile:
+      tag: 
+        user: 03192859189254
+        name: 
+          valueFromCommand: 'echo $BUILD_NAME'
+        version: 
+          valueFromCommand: 'echo $BUILD_BRANCH'
+  processes:
+    - title: "Starting container"
+      commands:
+        - TEST_CONTAINER_ID=$(docker run -d -p 127.0.0.1:${TEST_PORT}:${BUILD_DOCKERFILE_PORTS_MAIN} ${TEST_DOCKERFILE_TAG_USER}/${TEST_DOCKERFILE_TAG_NAME}:${TEST_DOCKERFILE_TAG_VERSION})
+
+    - title: "Testing httpd"
+      commands:
+        - /usr/local/apache2/bin/apachectl -t
+        - curl 127.0.0.1:${TEST_PORT}/index.html -f
+
+    - title: "Cleaning"
+      commands:
+        - docker exec $TEST_CONTAINER_ID /bin/sh -c "rm /var/www/html/test.html"
