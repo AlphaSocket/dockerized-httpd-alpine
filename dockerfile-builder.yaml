@@ -1,6 +1,6 @@
 project:
   title: &project_title Magento Apache Alpine Image build
-  codename: &project_codename docker-magento-apache-alpine
+  codename: &project_codename dockerized-apache-alpine
   version: &project_version 0.1.0
 
 #
@@ -189,7 +189,7 @@ test:
     - title: "Testing httpd container"
       shell_condition: '! "$TEST_HTTPD_CONTAINER_STATUS" == "true"'
       commands:
-        - echo -ne "Httpd container failed, print logs and exiting \n"
+        - echo -ne "Httpd container failed, print logs and exiting\n"
         - docker logs $TEST_HTTPD_CONTAINER_ID
         - exit 1
         
@@ -212,7 +212,7 @@ test:
       shell_condition: $SETUP_PHP_FPM = $GENERAL_KEYS_TRUE
       shell_condition: '! "$TEST_PHP_CONTAINER_STATUS" = "true"'
       commands:
-        - echo -ne "PHP-FPM container failed, print logs and exiting \n"
+        - echo -ne "PHP-FPM container failed, print logs and exiting\n"
         - docker logs $TEST_PHP_CONTAINER_ID
         - exit 1
 
@@ -234,11 +234,11 @@ test:
     - title: "Checking exit code"
       shell_condition: '! "$HTTP_CODE" == "200"'
       commands:
-        - echo -ne "\n### Test failed, received HTTP code ${HTTP_CODE} printing log \n\n" 
+        - echo -ne "### Test failed, received HTTP code ${HTTP_CODE} printing log\n" 
         - docker logs $TEST_APACHE_CONTAINER_ID
         - exit 1
 
     - title: "Print success"
       shell_condition: '"$HTTP_CODE" == "200"'
       commands:
-        - echo -ne "\n### Test succeeded\n"
+        - echo -ne "### Test succeeded\n"
