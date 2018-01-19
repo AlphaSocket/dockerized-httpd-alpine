@@ -1,5 +1,5 @@
 project:
-  title: &project_title Magento Apache Alpine Image build
+  title: &project_title Dockerized httpd service on alpine distro
   codename: &project_codename apache-alpine
 
 #
