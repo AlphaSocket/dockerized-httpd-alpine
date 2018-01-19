@@ -1,13 +1,14 @@
 project:
   title: &project_title Magento Apache Alpine Image build
   codename: &project_codename apache-alpine
-  version: &project_version 0.1.0
 
 #
 # Init builder
 #
 general:
   envvars:
+    docker:
+      user: &general_docker_user 03192859189254         
     keys:
       True: "True"
       false: "False"
@@ -178,7 +179,7 @@ test:
       volumes:
         webroot: volumes/test_webroot:$CONFIG_HTTPD_DOCUMENT_ROOT
       tag: 
-        user: 03192859189254
+        user: *general_docker_user
         name: $BUILD_NAME
         version: $BUILD_BRANCH
   processes:
