@@ -16,12 +16,12 @@ echo -ne "\nIncludeOptional $SETUP_HTTPD_CONF_VHOSTD/*.conf\n" >> $SETUP_HTTPD_C
 
 # Enable Production required modules
 if [ "$BUILD_ENV" = "$GENERAL_KEYS_PRD" ]; then
-    sed -i '/LoadModule.*ssl_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
+    sed -i '/LoadModule.*ssl_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN;
 fi
 # Enable PHP FPM required modules
 if [ "$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE" ]; then
-    sed -i '/LoadModule.*proxy_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
-    sed -i '/LoadModule.*proxy_fcgi_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
+    sed -i '/LoadModule.*proxy_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN;
+    sed -i '/LoadModule.*proxy_fcgi_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN;
 fi
 
 
