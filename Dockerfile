@@ -10,7 +10,7 @@ ENV \
 	GENERAL_KEYS_PRD="prd" \
 	BUILD_NAME="apache-alpine" \
 	BUILD_BRANCH="latest" \
-	BUILD_COMMIT="668e412" \
+	BUILD_COMMIT="0fc6b24" \
 	BUILD_VERSION="latest" \
 	BUILD_ENV="prd" \
 	BUILD_HTTPD_PORT_DEV="80" \
