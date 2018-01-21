@@ -3,6 +3,9 @@
 #
 FROM httpd:alpine
 
+ARG BUILD_COMMIT
+ARG BUILD_TIME
+
 ENV \
 	GENERAL_DOCKER_USER="03192859189254" \
 	GENERAL_KEYS_TRUE="True" \
@@ -11,7 +14,7 @@ ENV \
 	GENERAL_KEYS_PRD="prd" \
 	BUILD_NAME="apache-alpine" \
 	BUILD_BRANCH="latest-dev" \
-	BUILD_COMMIT="2964732" \
+	BUILD_COMMIT="3af4426" \
 	BUILD_VERSION="latest" \
 	BUILD_ENV="dev" \
 	BUILD_HTTPD_PORT_DEV="80" \
@@ -19,6 +22,8 @@ ENV \
 	BUILD_DOCKERFILE_IMAGE="httpd:alpine" \
 	BUILD_DOCKERFILE_PORTS_MAIN="80" \
 	BUILD_DOCKERFILE_CMD="httpd-foreground" \
+	SETUP_DEPENDENCIES_SETUP="None" \
+	SETUP_DEPENDENCIES_CONFIG="None" \
 	SETUP_HTTPD_CONF_PATH="/usr/local/apache2/conf" \
 	SETUP_HTTPD_CONF_MAIN="/usr/local/apache2/conf/httpd.conf" \
 	SETUP_HTTPD_CONF_CONFD="/usr/local/apache2/conf/conf.d" \
@@ -52,10 +57,13 @@ ADD templates /usr/local/templates
 RUN chmod +rx /usr/local/bin/setup && \
     chmod +rx /usr/local/bin/config && \
     sync && \
-    #. /usr/local/envvars && \
     /usr/local/bin/setup 
 
 EXPOSE 80 
 
 ENTRYPOINT ["/bin/sh", "-c"]
 CMD ["/usr/local/bin/config && httpd-foreground"]
+
+LABEL \
+    org.label-schema.vcs-ref=3af4426 \
+    org.label-schema.vcs-url="https://github.com/AlphaSocket/dockerized-apache-alpine"

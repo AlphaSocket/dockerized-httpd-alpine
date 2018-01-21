@@ -1,6 +1,6 @@
 # Alphasocket/dockerized-apache-alpine
 #### apache-alpine
-[![](https://travis-ci.org/AlphaSocket/dockerized-apache-alpine.svg?branch=latest )]() [![](https://images.microbadger.com/badges/image/03192859189254/dockerized-apache-alpine:latest.svg)](https://microbadger.com/images/03192859189254/dockerized-apache-alpine:latest ) [![](https://images.microbadger.com/badges/version/03192859189254/dockerized-apache-alpine:latest.svg)](https://microbadger.com/images/03192859189254/dockerized-apache-alpine:latest)
+[![](https://travis-ci.org/AlphaSocket/dockerized-apache-alpine.svg?branch=latest-dev )]() [![](https://images.microbadger.com/badges/image/03192859189254/dockerized-apache-alpine:latest-dev.svg)](https://microbadger.com/images/03192859189254/dockerized-apache-alpine:latest-dev ) [![](https://images.microbadger.com/badges/version/03192859189254/dockerized-apache-alpine:latest-dev.svg)](https://microbadger.com/images/03192859189254/dockerized-apache-alpine:latest-dev)
 
 Dockerized httpd service on alpine distro
 

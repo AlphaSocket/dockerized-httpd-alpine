@@ -4,6 +4,10 @@
 # exit if a command fails
 set -e
 
+# Install dependencies
+if [ ! "$SETUP_DEPENDENCIES_CONFIG$SETUP_DEPENDENCIES_SETUP" = "" ]; then
+    apk add --no-cache $SETUP_DEPENDENCIES_CONFIG $SETUP_DEPENDENCIES_SETUP;
+fi
 # Enable required modules
 sed -i '/LoadModule.*rewrite_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
 sed -i '/LoadModule.*logio_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
