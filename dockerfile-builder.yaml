@@ -1,6 +1,7 @@
 project:
-  title: &project_title Dockerized httpd service on alpine distro
+  title: &project_title Alphasocket/dockerized-apache-alpine
   codename: &project_codename apache-alpine
+  description: Dockerized httpd service on alpine distro
 
 #
 # Init builder
@@ -51,6 +52,9 @@ build:
 setup:
   # Setup env 
   envvars:
+    dependencies:
+      setup: 
+      config: 
     httpd:
       conf:
         path: /usr/local/apache2/conf
@@ -62,6 +66,10 @@ setup:
       fpm: True
   # Setup Processes
   processes:
+    - title: "Install dependencies"
+      shell_condition: '! "$SETUP_DEPENDENCIES_CONFIG$SETUP_DEPENDENCIES_SETUP" = ""'
+      commands: 
+        - "apk add --no-cache $SETUP_DEPENDENCIES_CONFIG $SETUP_DEPENDENCIES_SETUP"
 
     - title: "Enable required modules"
       commands:
@@ -174,7 +182,7 @@ config:
 test:
   envvars:
     name: *project_codename
-    port: 30000
+    port: 38080
     dockerfile:
       volumes:
         webroot: volumes/test_webroot:$CONFIG_HTTPD_DOCUMENT_ROOT
