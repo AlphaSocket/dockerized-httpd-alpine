@@ -5,13 +5,16 @@ services:
 
 before_install:
   - sudo apt update && sudo apt install curl libfcgi0ldbl -y
-  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" $DOCKER_REGISTER;
-  - docker build -t 03192859189254/apache-alpine:latest .
+  - docker build 
+        --no-cache 
+        -t 03192859189254/apache-alpine:latest
+        --build-arg BUILD_COMMIT=`git rev-parse --short HEAD` 
+        --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` .
 
 script:
 # Starting httpd container
  - CURDIR=$(pwd)
- - TEST_HTTPD_CONTAINER_ID=$( docker run -d --name=apache-alpine -e CONFIG_HTTPD_DOCUMENT_ROOT=/var/www/html -e CONFIG_PHP_FPM_HOST=127.0.0.1 -v $CURDIR/volumes/test_webroot:/var/www/html -p 30000:443 03192859189254/apache-alpine:latest )
+ - TEST_HTTPD_CONTAINER_ID=$( docker run -d --name=apache-alpine -e CONFIG_HTTPD_DOCUMENT_ROOT=/var/www/html -e CONFIG_PHP_FPM_HOST=127.0.0.1 -v $CURDIR/volumes/test_webroot:/var/www/html -p 38080:443 03192859189254/apache-alpine:latest )
  - TEST_HTTPD_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_HTTPD_CONTAINER_ID)
 
 # Testing httpd container
@@ -32,7 +35,7 @@ script:
         exit 1;
     fi
 # Testing httpd
- - HTTP_CODE=$( sleep 1 && curl -sLI 127.0.0.1:30000/index.html -o /dev/null -w '%{http_code}\n' )
+ - HTTP_CODE=$( sleep 1 && curl -sLI 127.0.0.1:38080/index.html -o /dev/null -w '%{http_code}\n' )
 
 # Checking exit code
  - if [ ! "$HTTP_CODE" = "200" ]; then
@@ -42,7 +45,7 @@ script:
     fi
 # Testing PHP service
  - if [ "True" = "True" ]; then
-        HTTP_CONTENT=$( sleep 1 && curl 127.0.0.1:30000/index.php );
+        HTTP_CONTENT=$( sleep 1 && curl 127.0.0.1:38080/index.php );
     fi
 # Print success
  - if [ grep -q "http://www.php.net/" <<< "$HTTP_CONTENT" ]; then
@@ -51,6 +54,7 @@ script:
 
 
 after_success:
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" $DOCKER_REGISTER;
   - if [ "$DOCKER_USERNAME" ]; then
         docker tag 03192859189254/apache-alpine:latest ${DOCKER_REGISTER}/${DOCKER_USERNAME}/apache-alpine:latest;
         docker push ${DOCKER_REGISTER}/${DOCKER_USERNAME}/apache-alpine:latest;
