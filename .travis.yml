@@ -7,14 +7,14 @@ before_install:
   - sudo apt update && sudo apt install curl libfcgi0ldbl -y
   - docker build 
         --no-cache 
-        -t 03192859189254/apache-alpine:latest
+        -t 03192859189254/httpd-alpine:latest
         --build-arg BUILD_COMMIT=`git rev-parse --short HEAD` 
         --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` .
 
 script:
 # Starting httpd container
  - CURDIR=$(pwd)
- - TEST_HTTPD_CONTAINER_ID=$( docker run -d --name=apache-alpine -e CONFIG_HTTPD_DOCUMENT_ROOT=/var/www/html -e CONFIG_PHP_FPM_HOST=127.0.0.1 -v $CURDIR/volumes/test_webroot:/var/www/html -p 38080:443 03192859189254/apache-alpine:latest )
+ - TEST_HTTPD_CONTAINER_ID=$( docker run -d --name=httpd-alpine -e CONFIG_HTTPD_DOCUMENT_ROOT=/var/www/html -e CONFIG_PHP_FPM_HOST=127.0.0.1 -v $CURDIR/volumes/test_webroot:/var/www/html -p 38080:443 03192859189254/httpd-alpine:latest )
  - TEST_HTTPD_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_HTTPD_CONTAINER_ID)
 
 # Testing httpd container
@@ -25,7 +25,7 @@ script:
     fi
 # Running PHP-FPM container
  - if [ "True" = "True" ]; then
-        TEST_PHP_CONTAINER_ID=$( docker run -d --net=container:apache-alpine -v $CURDIR/volumes/test_webroot:/var/www/html quay.io/alphasocket/docker-magento-php-fpm-alpine:7.0 );
+        TEST_PHP_CONTAINER_ID=$( docker run -d --net=container:httpd-alpine -v $CURDIR/volumes/test_webroot:/var/www/html quay.io/alphasocket/docker-magento-php-fpm-alpine:7.0 );
         TEST_PHP_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_PHP_CONTAINER_ID);
     fi
 # Testing PHP-FPM container
@@ -56,6 +56,6 @@ script:
 after_success:
   - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" $DOCKER_REGISTER;
   - if [ "$DOCKER_USERNAME" ]; then
-        docker tag 03192859189254/apache-alpine:latest ${DOCKER_REGISTER}/${DOCKER_USERNAME}/apache-alpine:latest;
-        docker push ${DOCKER_REGISTER}/${DOCKER_USERNAME}/apache-alpine:latest;
+        docker tag 03192859189254/httpd-alpine:latest ${DOCKER_REGISTER}/${DOCKER_USERNAME}/httpd-alpine:latest;
+        docker push ${DOCKER_REGISTER}/${DOCKER_USERNAME}/httpd-alpine:latest;
     fi
