@@ -14,7 +14,7 @@ ENV \
 	GENERAL_KEYS_PRD="prd" \
 	BUILD_NAME="apache-alpine" \
 	BUILD_BRANCH="latest-dev" \
-	BUILD_COMMIT="db805e8" \
+	BUILD_COMMIT="08c39b5" \
 	BUILD_VERSION="latest" \
 	BUILD_ENV="dev" \
 	BUILD_HTTPD_PORT_DEV="80" \
@@ -65,5 +65,5 @@ ENTRYPOINT ["/bin/sh", "-c"]
 CMD ["/usr/local/bin/config && httpd-foreground"]
 
 LABEL \
-    org.label-schema.vcs-ref=db805e8 \
+    org.label-schema.vcs-ref=08c39b5 \
     org.label-schema.vcs-url="https://github.com/AlphaSocket/dockerized-apache-alpine"
