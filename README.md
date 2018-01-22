@@ -1,6 +1,6 @@
 # Alphasocket/dockerized-apache-alpine
-#### apache-alpine
-[![](https://travis-ci.org/AlphaSocket/dockerized-apache-alpine.svg?branch=latest )]() [![](https://images.microbadger.com/badges/image/03192859189254/dockerized-apache-alpine:latest.svg)](https://microbadger.com/images/03192859189254/dockerized-apache-alpine:latest ) [![](https://images.microbadger.com/badges/version/03192859189254/dockerized-apache-alpine:latest.svg)](https://microbadger.com/images/03192859189254/dockerized-apache-alpine:latest)
+#### httpd-alpine
+[![](https://travis-ci.org/AlphaSocket/dockerized-httpd-alpine.svg?branch=latest )]() [![](https://images.microbadger.com/badges/image/03192859189254/dockerized-httpd-alpine:latest.svg)](https://microbadger.com/images/03192859189254/dockerized-httpd-alpine:latest ) [![](https://images.microbadger.com/badges/version/03192859189254/dockerized-httpd-alpine:latest.svg)](https://microbadger.com/images/03192859189254/dockerized-httpd-alpine:latest)
 
 Dockerized httpd service on alpine distro
 
@@ -18,8 +18,8 @@ Dockerized httpd service on alpine distro
 
 ## Configurable envvars
 ~~~
-CONFIG_HTTPD_SERVERNAME='apache-alpine'
-CONFIG_HTTPD_ALIAS='apache-alpine'
+CONFIG_HTTPD_SERVERNAME='httpd-alpine'
+CONFIG_HTTPD_ALIAS='httpd-alpine'
 CONFIG_HTTPD_TIMEOUT='1000'
 CONFIG_HTTPD_DOCUMENT_ROOT='/var/www/html'
 CONFIG_HTTPD_DOCUMENT_INDEX='index.php'
