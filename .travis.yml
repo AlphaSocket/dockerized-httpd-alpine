@@ -48,7 +48,7 @@ script:
         HTTP_CONTENT=$( sleep 1 && curl 127.0.0.1:38080/index.php );
     fi
 # Print success
- - if [ grep -q "http://www.php.net/" <<< "$HTTP_CONTENT" ]; then
+ - if [ echo "$HTTP_CONTENT" | grep -q "http://www.php.net/" ]; then
         echo "### Test succeeded\n";
     fi
 
