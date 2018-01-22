@@ -262,6 +262,6 @@ test:
         - HTTP_CONTENT=$( sleep 1 && curl 127.0.0.1:${TEST_PORT}/index.php )
         
     - title: "Print success"
-      shell_condition: 'grep -q "http://www.php.net/" <<< "$HTTP_CONTENT"'
+      shell_condition: 'echo "$HTTP_CONTENT" | grep -q "http://www.php.net/"'
       commands:
         - echo "### Test succeeded\n"
