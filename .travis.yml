@@ -19,7 +19,7 @@ script:
 
 # Testing httpd container
  - if [ ! "$TEST_HTTPD_CONTAINER_STATUS" = "true" ]; then
-        echo "Httpd container failed, print logs and exiting\n";
+        printf 'Httpd container failed, print logs and exiting\n';
         docker logs $TEST_HTTPD_CONTAINER_ID;
         exit 1;
     fi
@@ -30,7 +30,7 @@ script:
     fi
 # Testing PHP-FPM container
  - if [ ! "$TEST_PHP_CONTAINER_STATUS" = "true" ]; then
-        echo "PHP-FPM container failed, print logs and exiting\n";
+        printf 'PHP-FPM container failed, print logs and exiting\n';
         docker logs $TEST_PHP_CONTAINER_ID;
         exit 1;
     fi
@@ -40,7 +40,7 @@ script:
 
 # Checking exit code
  - if [ ! "$HTTP_CODE" = "200" ]; then
-        echo "### Test failed, received HTTP code ${HTTP_CODE} printing log\n";
+        printf '### Test failed, received HTTP code ${HTTP_CODE} printing log\n';
         docker logs $TEST_HTTPD_CONTAINER_ID;
         exit 1;
     fi
@@ -56,12 +56,12 @@ script:
     fi
 # Print failure
  - if [ ! "$PHP_TEST" = "Success" ]; then
-        echo "### Test failed\n";
+        printf '### Test failed\n';
         exit 1;
     fi
 # Print success
  - if [ "$PHP_TEST" = "Success" ]; then
-        echo "### Test succeeded\n";
+        printf '### Test succeeded\n';
     fi
 
 
