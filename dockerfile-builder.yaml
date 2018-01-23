@@ -1,6 +1,6 @@
 project:
   title: &project_title Alphasocket/dockerized-apache-alpine
-  codename: &project_codename httpd-alpine
+  codename: &project_codename apache-alpine
   description: Dockerized httpd service on alpine distro
 
 #
