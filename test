@@ -60,6 +60,7 @@ if [ ! "$TEST_PHP_CONTAINER_STATUS" = "true" ]; then
 fi
 # Testing httpd
 HTTP_CODE=$( sleep 1 && curl -sLI 127.0.0.1:38080/index.html -o /dev/null -w '%{http_code}\n' )
+PHP_TEST="Success"
 
 # Checking exit code
 if [ ! "$HTTP_CODE" = "200" ]; then
@@ -70,9 +71,15 @@ fi
 # Testing PHP service
 if [ "True" = "True" ]; then
     HTTP_CONTENT=$( sleep 1 && curl 127.0.0.1:38080/index.php );
+    PHP_TEST=$( echo "$HTTP_CONTENT" | grep -q "http://www.php.net/" && echo "Success");
+fi
+# Print failure
+if [ ! "$PHP_TEST" = "Success" ]; then
+    echo "### Test failed\n";
+    exit 1;
 fi
 # Print success
-if [ echo "$HTTP_CONTENT" | grep -q "http://www.php.net/" ]; then
+if [ "$PHP_TEST" = "Success" ]; then
     echo "### Test succeeded\n";
 fi
 
