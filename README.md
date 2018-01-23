@@ -5,6 +5,8 @@
 Dockerized httpd service on alpine distro (FROM httpd:latest)
 
 ## Branches & Versions
+- latest
+- latest-dev
 
 
 ## Packages installed
