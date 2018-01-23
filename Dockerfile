@@ -12,9 +12,9 @@ ENV \
 	GENERAL_KEYS_FALSE="False" \
 	GENERAL_KEYS_DEV="dev" \
 	GENERAL_KEYS_PRD="prd" \
-	BUILD_NAME="apache-alpine" \
+	BUILD_NAME="httpd-alpine" \
 	BUILD_BRANCH="latest" \
-	BUILD_COMMIT="9aef7d8" \
+	BUILD_COMMIT="e6fe33b" \
 	BUILD_VERSION="latest" \
 	BUILD_ENV="prd" \
 	BUILD_HTTPD_PORT_DEV="80" \
@@ -29,8 +29,8 @@ ENV \
 	SETUP_HTTPD_CONF_CONFD="/usr/local/apache2/conf/conf.d" \
 	SETUP_HTTPD_CONF_VHOSTD="/usr/local/apache2/conf/vhost.d" \
 	SETUP_PHP_FPM="True" \
-	CONFIG_HTTPD_SERVERNAME="apache-alpine" \
-	CONFIG_HTTPD_ALIAS="apache-alpine" \
+	CONFIG_HTTPD_SERVERNAME="httpd-alpine" \
+	CONFIG_HTTPD_ALIAS="httpd-alpine" \
 	CONFIG_HTTPD_TIMEOUT="1000" \
 	CONFIG_HTTPD_DOCUMENT_ROOT="/var/www/html" \
 	CONFIG_HTTPD_DOCUMENT_INDEX="index.php" \
@@ -65,5 +65,5 @@ ENTRYPOINT ["/bin/sh", "-c"]
 CMD ["/usr/local/bin/config && httpd-foreground"]
 
 LABEL \
-    org.label-schema.vcs-ref=9aef7d8 \
-    org.label-schema.vcs-url="https://github.com/AlphaSocket/dockerized-apache-alpine"
+    org.label-schema.vcs-ref=e6fe33b \
+    org.label-schema.vcs-url="https://github.com/AlphaSocket/dockerized-httpd-alpine"

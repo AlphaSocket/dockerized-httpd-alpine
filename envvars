@@ -7,9 +7,9 @@ GENERAL_KEYS_PRD='prd'
 
 
 # Build
-BUILD_NAME='apache-alpine'
+BUILD_NAME='httpd-alpine'
 BUILD_BRANCH='latest'
-BUILD_COMMIT='9aef7d8'
+BUILD_COMMIT='e6fe33b'
 BUILD_VERSION='latest'
 BUILD_ENV='prd'
 BUILD_HTTPD_PORT_DEV='80'
@@ -30,8 +30,8 @@ SETUP_PHP_FPM='True'
 
 
 # Config
-CONFIG_HTTPD_SERVERNAME='apache-alpine'
-CONFIG_HTTPD_ALIAS='apache-alpine'
+CONFIG_HTTPD_SERVERNAME='httpd-alpine'
+CONFIG_HTTPD_ALIAS='httpd-alpine'
 CONFIG_HTTPD_TIMEOUT='1000'
 CONFIG_HTTPD_DOCUMENT_ROOT='/var/www/html'
 CONFIG_HTTPD_DOCUMENT_INDEX='index.php'
