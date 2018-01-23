@@ -208,7 +208,7 @@ test:
     - title: "Testing httpd container"
       shell_condition: '! "$TEST_HTTPD_CONTAINER_STATUS" = "true"'
       commands:
-        - printf 'Httpd container failed, print logs and exiting\n'
+        - echo "Httpd container failed, print logs and exiting\n"
         - docker logs $TEST_HTTPD_CONTAINER_ID
         - exit 1
         
@@ -222,7 +222,7 @@ test:
             docker run 
               -d --net=container:$TEST_NAME 
               -v $CURDIR/$TEST_DOCKERFILE_VOLUMES_WEBROOT
-              quay.io/alphasocket/docker-magento-php-fpm-alpine:7.0
+              quay.io/alphasocket/php-fpm-alpine:7.0
           )
 
         - TEST_PHP_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_PHP_CONTAINER_ID)
@@ -231,7 +231,7 @@ test:
       shell_condition: '"$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE"'
       shell_condition: '! "$TEST_PHP_CONTAINER_STATUS" = "true"'
       commands:
-        - printf 'PHP-FPM container failed, print logs and exiting\n'
+        - echo "PHP-FPM container failed, print logs and exiting\n"
         - docker logs $TEST_PHP_CONTAINER_ID
         - exit 1
 
@@ -246,7 +246,7 @@ test:
     - title: "Checking exit code"
       shell_condition: '! "$HTTP_CODE" = "200"'
       commands:
-        - printf '### Test failed, received HTTP code ${HTTP_CODE} printing log\n'
+        - echo "### Test failed, received HTTP code ${HTTP_CODE} printing log\n" 
         - docker logs $TEST_HTTPD_CONTAINER_ID
         - exit 1
 
@@ -269,10 +269,10 @@ test:
     - title: "Print failure"
       shell_condition: '! "$PHP_TEST" = "Success"'
       commands:
-        - printf '### Test failed\n'
+        - echo "### Test failed\n"
         - exit 1
 
     - title: "Print success"
       shell_condition: '"$PHP_TEST" = "Success"'
       commands:
-        - printf '### Test succeeded\n'
+        - echo "### Test succeeded\n"
