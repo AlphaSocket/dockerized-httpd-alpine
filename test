@@ -70,7 +70,12 @@ if [ ! "$HTTP_CODE" = "200" ]; then
 fi
 # Testing PHP service
 if [ "True" = "True" ]; then
-    HTTP_CONTENT=$( sleep 1 && curl 127.0.0.1:38080/index.php );
+    CONDITION="curl -sf 127.0.0.1:38080/index.php --max-time 1 -o /dev/null";
+    MAX_TRIES=300;
+    SECONDS_BETWEEN_TRIES=1;
+    c=0;
+    while ! eval "$CONDITION"; do if [ $c -ge ${MAX_TRIES} ]; then exit 1; else c=$(($c + 1)); fi; echo "Try $c failed"; sleep ${SECONDS_BETWEEN_TRIES}; done;
+    HTTP_CONTENT=$(curl -s 127.0.0.1:38080/index.php);
     PHP_TEST=$( echo "$HTTP_CONTENT" | grep -q "http://www.php.net/" && echo "Success");
 fi
 # Print failure
