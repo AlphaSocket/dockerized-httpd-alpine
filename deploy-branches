@@ -51,7 +51,7 @@ do
     git pull origin $branch
     git merge master --no-commit 
     git add .
-    rm .gitignore
+    rm -f .gitignore
     git commit -m "Merged master in $branch" --allow-empty --author "$GIT_AUTHOR"
     $(which dockerfile-build)
     git add .
