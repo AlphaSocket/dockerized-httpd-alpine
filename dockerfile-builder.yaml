@@ -1,7 +1,7 @@
 project:
-  title: &project_title Alphasocket/dockerized-apache-alpine
-  codename: &project_codename apache-alpine
-  description: Dockerized httpd service on alpine distro
+  title: &project_title Alphasocket/dockerized-httpd-alpine
+  codename: &project_codename httpd-alpine
+  description: Dockerized httpd service on alpine distro (FROM httpd:latest)
 
 #
 # Init builder
@@ -42,7 +42,6 @@ build:
       ports:
         main: 
           valueFromCommand: '[ "$BUILD_ENV" = "$GENERAL_KEYS_DEV" ] && echo "$BUILD_HTTPD_PORT_DEV" || echo "$BUILD_HTTPD_PORT_PRD"'
-      # cmd: /usr/sbin/httpd -D FOREGROUND -f /etc/apache2/httpd.conf
       cmd: httpd-foreground
 
 
@@ -58,7 +57,6 @@ setup:
     httpd:
       conf:
         path: /usr/local/apache2/conf
-        #path: /etc/apache2/
         main: ${SETUP_HTTPD_CONF_PATH}/httpd.conf
         confd: ${SETUP_HTTPD_CONF_PATH}/conf.d
         vhostd: ${SETUP_HTTPD_CONF_PATH}/vhost.d
@@ -250,15 +248,12 @@ test:
       shell_condition: '! "$HTTP_CODE" = "200"'
       commands:
         - echo "### Test failed, received HTTP code ${HTTP_CODE} printing log\n" 
-        - docker logs $TEST_APACHE_CONTAINER_ID
+        - docker logs $TEST_HTTPD_CONTAINER_ID
         - exit 1
 
     - title: "Testing PHP service"
       shell_condition: '"$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE"'
       commands:
-        # Injecting test
-        #- docker exec $TEST_APACHE_CONTAINER_ID /bin/sh -c "echo '<?php phpinfo(); ?>' > /usr/local/apache2/htdocs/index.php"
-        #- docker exec $TEST_PHP_CONTAINER_ID /bin/sh -c "echo '<?php phpinfo(); ?>' > /var/www/html/index.php"
         - HTTP_CONTENT=$( sleep 1 && curl 127.0.0.1:${TEST_PORT}/index.php )
         
     - title: "Print success"
