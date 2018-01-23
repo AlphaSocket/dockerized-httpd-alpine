@@ -61,10 +61,6 @@ done
 #
 # Push
 #
+git checkout $GIT_BRANCH_MASTER --force
 git push https://$GIT_USER$pass@github.com/$GIT_USER/$REPO_NAME --all
 git push https://$GIT_USER$pass@github.com/$GIT_USER/$REPO_NAME --tags
-
-#
-# Reset
-#
-git checkout $GIT_BRANCH_MASTER --force
