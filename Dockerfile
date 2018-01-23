@@ -21,8 +21,8 @@ ENV \
 	BUILD_DOCKERFILE_IMAGE="httpd:alpine" \
 	BUILD_DOCKERFILE_PORTS_MAIN="443" \
 	BUILD_DOCKERFILE_CMD="httpd-foreground" \
-	SETUP_DEPENDENCIES_SETUP="None" \
-	SETUP_DEPENDENCIES_CONFIG="None" \
+	SETUP_DEPENDENCIES_SETUP="" \
+	SETUP_DEPENDENCIES_CONFIG="" \
 	SETUP_HTTPD_CONF_PATH="/usr/local/apache2/conf" \
 	SETUP_HTTPD_CONF_MAIN="/usr/local/apache2/conf/httpd.conf" \
 	SETUP_HTTPD_CONF_CONFD="/usr/local/apache2/conf/conf.d" \
