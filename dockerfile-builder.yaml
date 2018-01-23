@@ -253,7 +253,17 @@ test:
     - title: "Testing PHP service"
       shell_condition: '"$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE"'
       commands:
-        - HTTP_CONTENT=$( sleep 1 && curl 127.0.0.1:${TEST_PORT}/index.php )
+        - CONDITION="curl -sf 127.0.0.1:${TEST_PORT}/index.php --max-time 1 -o /dev/null"
+        - MAX_TRIES=300
+        - SECONDS_BETWEEN_TRIES=1
+        - c=0
+        - while ! eval "$CONDITION"; 
+          do 
+            if [ $c -ge ${MAX_TRIES} ]; then exit 1; else c=$(($c + 1)); fi;
+            echo "Try $c failed"; 
+            sleep ${SECONDS_BETWEEN_TRIES}; 
+          done
+        - HTTP_CONTENT=$(curl -s 127.0.0.1:${TEST_PORT}/index.php)
         - PHP_TEST=$( echo "$HTTP_CONTENT" | grep -q "http://www.php.net/" && echo "Success")
         
     - title: "Print failure"
