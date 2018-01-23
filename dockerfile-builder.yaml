@@ -241,6 +241,7 @@ test:
     - title: "Testing httpd"
       commands:
         - HTTP_CODE=$( sleep 1 && curl -sLI 127.0.0.1:${TEST_PORT}/index.html -o /dev/null -w '%{http_code}\n' )
+        - PHP_TEST="Success"
 
     - title: "Checking exit code"
       shell_condition: '! "$HTTP_CODE" = "200"'
@@ -253,8 +254,15 @@ test:
       shell_condition: '"$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE"'
       commands:
         - HTTP_CONTENT=$( sleep 1 && curl 127.0.0.1:${TEST_PORT}/index.php )
+        - PHP_TEST=$( echo "$HTTP_CONTENT" | grep -q "http://www.php.net/" && echo "Success")
         
+    - title: "Print failure"
+      shell_condition: '! "$PHP_TEST" = "Success"'
+      commands:
+        - echo "### Test failed\n"
+        - exit 1
+
     - title: "Print success"
-      shell_condition: 'echo "$HTTP_CONTENT" | grep -q "http://www.php.net/"'
+      shell_condition: '"$PHP_TEST" = "Success"'
       commands:
         - echo "### Test succeeded\n"
