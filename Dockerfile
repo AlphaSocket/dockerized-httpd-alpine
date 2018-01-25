@@ -7,8 +7,8 @@ ARG BUILD_COMMIT
 ARG BUILD_TIME
 
 ENV \
-	 BUILD_COMMIT=$BUILD_COMMIT \
-	 BUILD_DATE=$BUILD_DATE \
+	BUILD_COMMIT=$BUILD_COMMIT \
+	BUILD_DATE=$BUILD_DATE \
 	GENERAL_DOCKER_USER="03192859189254" \
 	GENERAL_KEYS_TRUE="True" \
 	GENERAL_KEYS_FALSE="False" \
@@ -60,7 +60,7 @@ RUN chmod +rx /usr/local/bin/setup && \
     sync && \
     /usr/local/bin/setup 
 
-EXPOSE 80 
+EXPOSE 80 80
 
 ENTRYPOINT ["/bin/sh", "-c"]
 CMD ["/usr/local/bin/config && httpd-foreground"]
