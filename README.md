@@ -10,10 +10,6 @@ Dockerized httpd service on alpine distro (FROM httpd:latest)
 
 
 ## Packages installed
-- Setup dependencies:
-  + None
-- Config dependencies:
-  + None
 
 
 ## Configurable envvars
