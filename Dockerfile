@@ -50,20 +50,28 @@ ENV \
 	CONFIG_PATHS_CONF_HTTPD_FASTCGI="/usr/local/apache2/conf/conf.d/20-fastcgi.conf" \
 	CONFIG_PATHS_CONF_HTTPD_VHOST="/usr/local/apache2/conf/vhost.d/main.conf"
 
-ADD envvars /usr/local/envvars
-ADD bin/setup /usr/local/bin/setup
-ADD bin/config /usr/local/bin/config
+RUN if [ ! -d "/usr/local/bin/setup" ]; then \
+        mkdir -p /usr/local/bin/setup; \
+    fi \
+    && \
+    if [ ! -d "/usr/local/bin/config" ]; then \
+        mkdir -p /usr/local/bin/config; \
+    fi
+
+ADD bin/docker-config /usr/local/bin/docker-config
+ADD bin/setup /usr/local/bin/setup/1516964378
+ADD bin/config /usr/local/bin/config/1516964378
 ADD templates /usr/local/templates
 
-RUN chmod +rx /usr/local/bin/setup && \
-    chmod +rx /usr/local/bin/config && \
+RUN chmod +x -R /usr/local/bin && \
     sync && \
-    /usr/local/bin/setup 
+    /usr/local/bin/setup/1516964378 
 
 EXPOSE 443 443
 
+
 ENTRYPOINT ["/bin/sh", "-c"]
-CMD ["/usr/local/bin/config && httpd-foreground"]
+CMD ["/usr/local/bin/docker-config && httpd-foreground"]
 
 LABEL \
     org.label-schema.vcs-ref=$BUILD_COMMIT \
