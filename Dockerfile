@@ -72,8 +72,8 @@ ADD imports/bin/docker-config /usr/local/bin/docker-config
 ADD imports/bin/docker-run /usr/local/bin/docker-run
 ADD imports/bin/docker-rediness-test /usr/local/bin/docker-rediness-test
 ADD imports/bin/docker-liveness-test /usr/local/bin/docker-liveness-test
-ADD imports/bin/setup /usr/local/bin/setup/1518818798
-ADD imports/bin/config /usr/local/bin/config/1518818798
+ADD imports/bin/setup /usr/local/bin/setup/1518819296
+ADD imports/bin/config /usr/local/bin/config/1518819296
 ADD imports/templates/10-ssl.conf /usr/local/templates/10-ssl.conf
 ADD imports/templates/20-fastcgi.conf /usr/local/templates/20-fastcgi.conf
 ADD imports/templates/prd_vhost.conf /usr/local/templates/prd_vhost.conf
@@ -83,7 +83,7 @@ ADD imports/templates/dev_vhost.conf /usr/local/templates/dev_vhost.conf
 
 RUN chmod +x -R /usr/local/bin && \
     sync && \
-    /usr/local/bin/setup/1518818798 1>/dev/stdout 2>/dev/stderr
+    /usr/local/bin/setup/1518819296 1>/dev/stdout 2>/dev/stderr
 
 EXPOSE 443 
 
