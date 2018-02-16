@@ -35,9 +35,12 @@ setup:
     httpd:
       conf:
         path: /usr/local/apache2/conf
-        main: ${SETUP_HTTPD_CONF_PATH}/httpd.conf
-        confd: ${SETUP_HTTPD_CONF_PATH}/conf.d
-        vhostd: ${SETUP_HTTPD_CONF_PATH}/vhost.d
+        main:
+          valueFromParse: ${SETUP_HTTPD_CONF_PATH}/httpd.conf
+        confd:
+          valueFromParse: ${SETUP_HTTPD_CONF_PATH}/conf.d
+        vhostd:
+          valueFromParse: ${SETUP_HTTPD_CONF_PATH}/vhost.d
     php:
       fpm: True
   # Setup Processes
@@ -84,8 +87,10 @@ config:
   # Config env 
   envvars:
     httpd:
-      servername: $BUILD_NAME
-      alias: $BUILD_NAME
+      servername:
+          valueFromParse: $BUILD_NAME
+      alias:
+          valueFromParse: $BUILD_NAME
       timeout: 1000
       document:
         root: /var/www/html
