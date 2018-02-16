@@ -178,7 +178,7 @@ test:
               -e CONFIG_HTTPD_DOCUMENT_ROOT=${CONFIG_HTTPD_DOCUMENT_ROOT}
               -e CONFIG_PHP_FPM_HOST=127.0.0.1
               -v ${CURDIR}/${TEST_VOLUMES_WEBROOT}
-              -p ${TEST_HOST_PORT}:${BUILD_DOCKERFILE_PORTS_MAIN}
+              -p ${TEST_HOST_PORT}:${BUILD_PORTS_MAIN}
               ${BUILD_USER}/${BUILD_NAME}:${BUILD_VERSION}
           )
         - TEST_HTTPD_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_HTTPD_CONTAINER_ID)
@@ -219,7 +219,8 @@ test:
     #
     - title: "Testing httpd"
       commands:
-        - HTTP_CODE=$( sleep 1 && curl -sLI 127.0.0.1:${TEST_PORT}/index.html -o /dev/null -w '%{http_code}\n' )
+        - sleep 1
+        - HTTP_CODE=$( curl -sLI 127.0.0.1:${TEST_HOST_PORT}/index.html -o /dev/null -w '%{http_code}\n' )
 
     - title: "Checking exit code"
       shell_condition: '! "$HTTP_CODE" = "200"'
@@ -231,7 +232,7 @@ test:
     - title: "Testing PHP service"
       shell_condition: '"$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE"'
       commands:
-        - CONDITION="curl -sf 127.0.0.1:${TEST_PORT}/index.php --max-time 1 -o /dev/null"
+        - CONDITION="curl -sf 127.0.0.1:${TEST_HOST_PORT}/index.php --max-time 1 -o /dev/null"
         - MAX_TRIES=300
         - SECONDS_BETWEEN_TRIES=1
         - c=0
@@ -241,7 +242,7 @@ test:
             echo "Try $c failed"; 
             sleep ${SECONDS_BETWEEN_TRIES}; 
           done
-        - HTTP_CONTENT=$(curl -s 127.0.0.1:${TEST_PORT}/index.php)
+        - HTTP_CONTENT=$(curl -s 127.0.0.1:${TEST_HOST_PORT}/index.php)
         - PHP_TEST=$( echo "$HTTP_CONTENT" | grep -q "http://www.php.net/" && echo "Success")
 
     - title: "Check PHP test"
