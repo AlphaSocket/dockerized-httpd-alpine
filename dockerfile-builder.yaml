@@ -4,43 +4,23 @@ project:
   description: Dockerized httpd service on alpine distro (FROM httpd:latest)
 
 #
-# Init builder
-#
-general:
-  envvars:
-    docker:
-      user: &general_docker_user 03192859189254         
-    keys:
-      True: "True"
-      false: "False"
-      dev: "dev"
-      prd: "prd"
-    
-#
 # Build process
 # Creates dockerfile and file used in it
 #
 build:
-  import:
-    - "templates:/usr/local/templates"
   envvars:
+    from: 'httpd:alpine'
     name: *project_codename
-    branch:
-      valueFromCommand: 'git rev-parse --abbrev-ref HEAD'
-    version:
-      valueFromCommand: 'echo $BUILD_BRANCH | cut -d \- -f 1'
-    env:
-      valueFromCommand: 'env=$(echo $BUILD_BRANCH | cut -d \- -f 2); [ "$env" = "$BUILD_VERSION" ] && echo $GENERAL_KEYS_PRD || echo $env'
+    ports:
+      main: 
+        valueFromCommand: '[ "$BUILD_ENV" = "$GENERAL_KEYS_DEV" ] && echo "$BUILD_HTTPD_PORT_DEV" || echo "$BUILD_HTTPD_PORT_PRD"'
+    cmd: httpd-foreground
     httpd:
       port:
         dev: 80
         prd: 443
-    dockerfile:
-      image: 'httpd:alpine'
-      ports:
-        main: 
-          valueFromCommand: '[ "$BUILD_ENV" = "$GENERAL_KEYS_DEV" ] && echo "$BUILD_HTTPD_PORT_DEV" || echo "$BUILD_HTTPD_PORT_PRD"'
-      cmd: httpd-foreground
+  imports:
+    - "templates:/usr/local/templates"
 
 
 #
@@ -177,15 +157,8 @@ config:
     
 test:
   envvars:
-    name: *project_codename
-    port: 38080
-    dockerfile:
-      volumes:
-        webroot: volumes/test_webroot:$CONFIG_HTTPD_DOCUMENT_ROOT
-      tag: 
-        user: *general_docker_user
-        name: $BUILD_NAME
-        version: $BUILD_BRANCH
+    volumes:
+      webroot: volumes/test_webroot:$CONFIG_HTTPD_DOCUMENT_ROOT
   processes:
 
     # 
@@ -196,12 +169,12 @@ test:
         - CURDIR=$(pwd)
         - TEST_HTTPD_CONTAINER_ID=$(
             docker run 
-              -d --name=$TEST_NAME
+              -d --name=${TEST_CONTAINER_NAME}
               -e CONFIG_HTTPD_DOCUMENT_ROOT=${CONFIG_HTTPD_DOCUMENT_ROOT}
               -e CONFIG_PHP_FPM_HOST=127.0.0.1
-              -v $CURDIR/$TEST_DOCKERFILE_VOLUMES_WEBROOT
-              -p ${TEST_PORT}:${BUILD_DOCKERFILE_PORTS_MAIN}
-              ${TEST_DOCKERFILE_TAG_USER}/${TEST_DOCKERFILE_TAG_NAME}:${TEST_DOCKERFILE_TAG_VERSION} 
+              -v ${CURDIR}/${TEST_VOLUMES_WEBROOT}
+              -p ${TEST_HOST_PORT}:${BUILD_DOCKERFILE_PORTS_MAIN}
+              ${BUILD_USER}/${BUILD_NAME}:${BUILD_VERSION}
           )
         - TEST_HTTPD_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_HTTPD_CONTAINER_ID)
 
@@ -220,15 +193,16 @@ test:
       commands: 
         - TEST_PHP_CONTAINER_ID=$(
             docker run 
-              -d --net=container:$TEST_NAME 
-              -v $CURDIR/$TEST_DOCKERFILE_VOLUMES_WEBROOT
-              quay.io/alphasocket/php-fpm-alpine:7.0
+              -d --net=container:${TEST_CONTAINER_NAME} 
+              -v ${CURDIR}/${TEST_VOLUMES_WEBROOT}
+              docker.io/alphasocket/php-fpm-alpine:7.0
           )
-
-        - TEST_PHP_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_PHP_CONTAINER_ID)
+        - sleep 1
+        - TEST_PHP_CONTAINER_STATUS=$(docker inspect -f '{{.State.Running}}' $TEST_PHP_CONTAINER_ID)
+      else:
+        - TEST_PHP_CONTAINER_STATUS="true"
 
     - title: "Testing PHP-FPM container"
-      shell_condition: '"$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE"'
       shell_condition: '! "$TEST_PHP_CONTAINER_STATUS" = "true"'
       commands:
         - echo "PHP-FPM container failed, print logs and exiting\n"
