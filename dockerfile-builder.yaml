@@ -22,6 +22,10 @@ build:
   imports:
     - "templates:/usr/local/templates"
 
+cache:
+  docker_images:
+    - $BUILD_FROM
+    - docker.io/alphasocket/php-fpm-alpine:7.0
 
 #
 # Setup process injected in dockerfile
@@ -159,7 +163,7 @@ config:
       commands:
         # Create vhost
         - cp $VHOST_TEMPLATE $CONFIG_PATHS_CONF_HTTPD_VHOST
-    
+
 test:
   processes:
 
