@@ -163,7 +163,8 @@ config:
 test:
   envvars:
     volumes:
-      webroot: volumes/test_webroot:$CONFIG_HTTPD_DOCUMENT_ROOT
+      webroot:
+        valueFromPrse: $CONFIG_HTTPD_DOCUMENT_ROOT
   processes:
 
     # 
@@ -177,7 +178,7 @@ test:
               -d --name=${TEST_CONTAINER_NAME}
               -e CONFIG_HTTPD_DOCUMENT_ROOT=${CONFIG_HTTPD_DOCUMENT_ROOT}
               -e CONFIG_PHP_FPM_HOST=127.0.0.1
-              -v ${CURDIR}/${TEST_VOLUMES_WEBROOT}
+              -v ${CURDIR}/volumes/test_webroot:${TEST_VOLUMES_WEBROOT}
               -p ${TEST_HOST_PORT}:${BUILD_PORTS_MAIN}
               ${BUILD_USER}/${BUILD_NAME}:${BUILD_VERSION}
           )
