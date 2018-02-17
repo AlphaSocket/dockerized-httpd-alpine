@@ -25,11 +25,11 @@ ENV \
 	BUILD_VERSION="latest" \
 	BUILD_ENV="prd" \
 	BUILD_FROM="httpd:alpine" \
-	BUILD_PORTS_MAIN="443" \
+	BUILD_PORTS_MAIN="" \
 	BUILD_PORTS_ADDITIONAL="" \
-	BUILD_CMD="httpd-foreground" \
 	BUILD_HTTPD_PORT_DEV="80" \
 	BUILD_HTTPD_PORT_PRD="443" \
+	BUILD_CMD="httpd-foreground" \
 	SETUP_DEPENDENCIES_SETUP="" \
 	SETUP_DEPENDENCIES_CONFIG="" \
 	SETUP_HTTPD_CONF_PATH="/usr/local/apache2/conf" \
@@ -72,8 +72,8 @@ ADD imports/bin/docker-config /usr/local/bin/docker-config
 ADD imports/bin/docker-run /usr/local/bin/docker-run
 ADD imports/bin/docker-rediness-test /usr/local/bin/docker-rediness-test
 ADD imports/bin/docker-liveness-test /usr/local/bin/docker-liveness-test
-ADD imports/bin/setup /usr/local/bin/setup/1518819839
-ADD imports/bin/config /usr/local/bin/config/1518819839
+ADD imports/bin/setup /usr/local/bin/setup/1518870717
+ADD imports/bin/config /usr/local/bin/config/1518870717
 ADD imports/templates/10-ssl.conf /usr/local/templates/10-ssl.conf
 ADD imports/templates/20-fastcgi.conf /usr/local/templates/20-fastcgi.conf
 ADD imports/templates/prd_vhost.conf /usr/local/templates/prd_vhost.conf
@@ -83,9 +83,9 @@ ADD imports/templates/dev_vhost.conf /usr/local/templates/dev_vhost.conf
 
 RUN chmod +x -R /usr/local/bin && \
     sync && \
-    /usr/local/bin/setup/1518819839 1>/dev/stdout 2>/dev/stderr
+    /usr/local/bin/setup/1518870717 1>/dev/stdout 2>/dev/stderr
 
-EXPOSE 443 
+
 
 
 ENTRYPOINT ["/bin/sh", "-c"]
