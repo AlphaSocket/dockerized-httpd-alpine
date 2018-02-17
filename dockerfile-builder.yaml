@@ -9,16 +9,16 @@ project:
 #
 build:
   envvars:
+    httpd:
+      port:
+        dev: 80
+        prd: 443
     from: 'httpd:alpine'
     name: *project_codename
     ports:
       main: 
         valueFromCommand: '[ "$BUILD_ENV" = "$GENERAL_KEYS_DEV" ] && echo "$BUILD_HTTPD_PORT_DEV" || echo "$BUILD_HTTPD_PORT_PRD"'
     cmd: httpd-foreground
-    httpd:
-      port:
-        dev: 80
-        prd: 443
   imports:
     - "templates:/usr/local/templates"
 
@@ -200,7 +200,7 @@ test:
             docker run 
               -d --net=container:${TEST_CONTAINER_NAME} 
               -v ${CURDIR}/${TEST_VOLUMES_WEBROOT}
-              docker.io/alphasocket/php-fpm-alpine:7.0
+              quay.io/alphasocket/php-fpm-alpine:7.0
           )
         - sleep 1
         - TEST_PHP_CONTAINER_STATUS=$(docker inspect -f '{{.State.Running}}' $TEST_PHP_CONTAINER_ID)
