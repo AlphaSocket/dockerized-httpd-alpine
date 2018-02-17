@@ -4,6 +4,19 @@ project:
   description: Dockerized httpd service on alpine distro (FROM httpd:latest)
 
 #
+# Cached images
+#
+cache:
+  envvars:
+    images:
+      from:
+        valueFromParse: $BUILD_FROM
+      php_fpm: docker.io/alphasocket/php-fpm-alpine:7.1 
+  docker_images:
+    - $CACHE_IMAGES_FROM
+    - $CACHE_IMAGES_PHP_FPM
+
+#
 # Build process
 # Creates dockerfile and file used in it
 #
@@ -21,11 +34,6 @@ build:
     cmd: httpd-foreground
   imports:
     - "templates:/usr/local/templates"
-
-cache:
-  docker_images:
-    - $BUILD_FROM
-    - docker.io/alphasocket/php-fpm-alpine:7.0
 
 #
 # Setup process injected in dockerfile
@@ -166,9 +174,8 @@ config:
 
 test:
   processes:
-
     # 
-    # Run httpd
+    # Run httpd container
     # 
     - title: "Starting httpd container"
       commands: 
@@ -191,7 +198,7 @@ test:
         - exit 1
         
     # 
-    # Run php-fpm
+    # Run php-fpm container
     # 
     - title: "Running PHP-FPM container"
       shell_condition: '"$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE"'
@@ -200,7 +207,7 @@ test:
             docker run 
               -d --net=container:${TEST_CONTAINER_NAME} 
               -v ${CURDIR}/${TEST_VOLUMES_WEBROOT}
-              quay.io/alphasocket/php-fpm-alpine:7.0
+              ${CACHE_IMAGES_PHP_FPM}
           )
         - sleep 1
         - TEST_PHP_CONTAINER_STATUS=$(docker inspect -f '{{.State.Running}}' $TEST_PHP_CONTAINER_ID)
