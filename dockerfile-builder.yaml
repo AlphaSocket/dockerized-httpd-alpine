@@ -178,7 +178,7 @@ test:
               -d --name=${TEST_CONTAINER_NAME}
               -e CONFIG_PHP_FPM_HOST=127.0.0.1
               -v ${CURDIR}/volumes/test_webroot:${CONFIG_HTTPD_DOCUMENT_ROOT}
-              -p ${TEST_HOST_PORT}:${TEST_CONTAINER_PORT_MAIN}
+              -p ${TEST_HOST_PORT}:${TEST_CONTAINER_PORTS_MAIN}
               ${BUILD_USER}/${BUILD_NAME}:${BUILD_VERSION}
           )
         - TEST_HTTPD_CONTAINER_STATUS=$(sleep 1 && docker inspect -f '{{.State.Running}}' $TEST_HTTPD_CONTAINER_ID)
