@@ -11,7 +11,7 @@ cache:
     images:
       from:
         valueFromParse: $BUILD_FROM
-      php_fpm: docker.io/alphasocket/php-fpm-alpine:7.1 
+      php_fpm: alphasocket/php-fpm-alpine:7.1 
   docker_images:
     - $CACHE_IMAGES_FROM
     - $CACHE_IMAGES_PHP_FPM
