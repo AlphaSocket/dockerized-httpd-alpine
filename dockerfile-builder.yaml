@@ -127,10 +127,14 @@ config:
             prd: /usr/local/templates/prd_vhost.conf
       conf:
         httpd:
-          server: ${SETUP_HTTPD_CONF_CONFD}/10-server.conf
-          ssl: ${SETUP_HTTPD_CONF_CONFD}/10-ssl.conf
-          fastcgi: ${SETUP_HTTPD_CONF_CONFD}/20-fastcgi.conf
-          vhost: ${SETUP_HTTPD_CONF_VHOSTD}/main.conf
+          server:
+            valueFromParse: ${SETUP_HTTPD_CONF_CONFD}/10-server.conf
+          ssl:
+            valueFromParse: ${SETUP_HTTPD_CONF_CONFD}/10-ssl.conf
+          fastcgi: 
+            valueFromParse: ${SETUP_HTTPD_CONF_CONFD}/20-fastcgi.conf
+          vhost:
+            valueFromParse: ${SETUP_HTTPD_CONF_VHOSTD}/main.conf
           
   processes:
     - title: "Make sure webroot exists"
