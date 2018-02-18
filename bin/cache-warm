@@ -12,9 +12,9 @@ if [ DOCKER = '' ]; then
 fi
 
 echo "#\n# Warming cache\n#\n"
-for image in "httpd:alpine docker.io/alphasocket/php-fpm-alpine:7.1"
+for image in httpd:alpine alphasocket/php-fpm-alpine:7.1
 do 
-    docker pull ${image} 1>/dev/null;
+    docker pull ${image} 1>/dev/null & true;
 done
 
 exit 0
