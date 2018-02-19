@@ -30,6 +30,9 @@ ENV \
 	BUILD_PORTS_ADDITIONAL="" \
 	BUILD_PORTS_MAIN="80" \
 	BUILD_CMD="httpd-foreground" \
+	SETUP_PATHS_BINARIES="/usr/local/bin" \
+	SETUP_PATHS_SETUP="/usr/local/bin/setup" \
+	SETUP_PATHS_CONFIG="/usr/local/bin/config" \
 	SETUP_DEPENDENCIES_SETUP="" \
 	SETUP_DEPENDENCIES_CONFIG="" \
 	SETUP_HTTPD_CONF_PATH="/usr/local/apache2/conf" \
@@ -67,21 +70,12 @@ ENV \
 	CONFIG_PATHS_CONF_HTTPD_SSL="/usr/local/apache2/conf/conf.d/10-ssl.conf" \
 	CONFIG_PATHS_CONF_HTTPD_FASTCGI="/usr/local/apache2/conf/conf.d/20-fastcgi.conf" \
 	CONFIG_PATHS_CONF_HTTPD_VHOST="/usr/local/apache2/conf/vhost.d/main.conf"
-
-RUN if [ ! -d "/usr/local/bin/setup" ]; then \
-        mkdir -p /usr/local/bin/setup; \
-    fi \
-    && \
-    if [ ! -d "/usr/local/bin/config" ]; then \
-        mkdir -p /usr/local/bin/config; \
-    fi
-
 ADD imports/bin/docker-config /usr/local/bin/docker-config
 ADD imports/bin/docker-run /usr/local/bin/docker-run
 ADD imports/bin/docker-rediness-test /usr/local/bin/docker-rediness-test
 ADD imports/bin/docker-liveness-test /usr/local/bin/docker-liveness-test
-ADD imports/bin/setup /usr/local/bin/setup/1519010202
-ADD imports/bin/config /usr/local/bin/config/1519010202
+ADD imports/bin/setup /usr/local/bin/setup/1519077091
+ADD imports/bin/config /usr/local/bin/config/1519077091
 ADD imports/templates/05-user-group.conf /usr/local/templates/05-user-group.conf
 ADD imports/templates/10-ssl.conf /usr/local/templates/10-ssl.conf
 ADD imports/templates/20-fastcgi.conf /usr/local/templates/20-fastcgi.conf
@@ -92,7 +86,7 @@ ADD imports/templates/dev_vhost.conf /usr/local/templates/dev_vhost.conf
 
 RUN chmod +x -R /usr/local/bin && \
     sync && \
-    /usr/local/bin/setup/1519010202 1>/dev/stdout 2>/dev/stderr
+    /usr/local/bin/setup/1519077091 1>/dev/stdout 2>/dev/stderr
 
 EXPOSE 80 
 
