@@ -17,78 +17,40 @@ echo "running_config" > /tmp/container_status
 #
 # Groups
 #
+set -x
 
 # Add main group
 if [ ! -z "$CONFIG_GROUPS_MAIN_NAME" ]; then
     if ! getent group "$CONFIG_GROUPS_MAIN_NAME"; then
         addgroup -S "$CONFIG_GROUPS_MAIN_NAME";
     fi
-    
-    # Check
-    if [ -z "$(getent group "$CONFIG_GROUPS_MAIN_NAME")" ]; then
-        echo "Missing group $CONFIG_GROUPS_MAIN_NAME"
-        exit 1;
-    fi
 fi
-
-
 
 # Add additional group
 if [ ! -z "$CONFIG_GROUPS_ADDITIONAL_NAME" ] ; then
     if ! getent group "$CONFIG_GROUPS_ADDITIONAL_NAME"; then
         addgroup -S "$CONFIG_GROUPS_ADDITIONAL_NAME";
     fi
-    # Check
-    if [ -z "$(getent group "$CONFIG_GROUPS_ADDITIONAL_NAME")" ]; then
-        echo "Missing group $CONFIG_GROUPS_ADDITIONAL_NAME"
-        exit 1;
-    fi
 fi
-
 
 # Main user
 if [ ! -z "$CONFIG_USERS_MAIN_NAME" ]; then
-    # Add user if not exists 
-    if ! id -u "$CONFIG_USERS_MAIN_NAME"; then
-        adduser "$CONFIG_USERS_MAIN_NAME";
+    # Remove user if not exists 
+    if id -u "$CONFIG_USERS_MAIN_NAME"; then
+        deluser "$CONFIG_USERS_MAIN_NAME";
     fi
-    
-    # Add user to each group is not assigned
-    for group in $CONFIG_USERS_MAIN_GROUPS;
-    do
-        # Check if user is already assiged
-        if id -nG "$CONFIG_USERS_MAIN_NAME" | grep -qw "$group"; then
-            true; 
-        else
-            adduser -S "$CONFIG_USERS_MAIN_NAME" "$group";
-        fi
-    done;
-
-    # Check
-    id -u "$CONFIG_USERS_MAIN_NAME"
+    # Add user specifing groups
+    adduser -S "$CONFIG_USERS_MAIN_NAME" -G $CONFIG_USERS_MAIN_GROUPS;
 fi
-
 
 # Add additional user
 if [ ! -z "$CONFIG_USERS_ADDITIONAL_NAME" ]; then
-    # Add user if not exists 
-    if ! id -u "$CONFIG_USERS_ADDITIONAL_NAME"; then
-        adduser "$CONFIG_USERS_ADDITIONAL_NAME";
+    # Remove user if not exists 
+    if id -u "$CONFIG_USERS_ADDITIONAL_NAME"; then
+        deluser "$CONFIG_USERS_ADDITIONAL_NAME";
     fi
-    
-    # Add user to each group is not assigned
-    for group in $CONFIG_USERS_ADDITIONAL_GROUPS;
-    do
-        # Check if user is already assiged
-        if id -nG "$CONFIG_USERS_ADDITIONAL_NAME" | grep -qw "$group"; then
-            true; 
-        else
-            adduser -S "$CONFIG_USERS_ADDITIONAL_NAME" "$group";
-        fi
-    done
-    
-    # Check
-    id -u "$CONFIG_USERS_ADDITIONAL_NAME"
+    # Add user specifing groups
+    adduser -S "$CONFIG_USERS_ADDITIONAL_NAME" -G $CONFIG_USERS_ADDITIONAL_NAME;
 fi
 
 #
