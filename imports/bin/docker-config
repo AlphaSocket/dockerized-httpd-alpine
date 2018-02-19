@@ -14,12 +14,67 @@ fi
 echo "### Starting container configuration"
 echo "running_config" > /tmp/container_status
 
+#
+# Groups
+#
+
+# Add main group
+if [ ! -z "www-data" ] && ! getent group "www-data"; then
+    addgroup -S "www-data";
+fi
+# Add additional group
+if [ ! -z "" ] && ! getent group ""; then
+    addgroup -S "";
+fi
+
+# Main user
+if [ ! -z "www-data" ]; then
+    # Add user if not exists 
+    if ! id -u "www-data"; then
+        adduser "www-data";
+    fi
+    
+    # Add user to each group is not assigned
+    for group in "www-data";
+    do
+        # Check if user is already assiged
+        if id -nG "www-data" | grep -qw "$group"; then
+            true; 
+        else
+            adduser -S "www-data" "$group";
+        fi
+    done
+fi
+
+# Add additional user
+if [ ! -z "" ]; then
+    # Add user if not exists 
+    if ! id -u ""; then
+        adduser "";
+    fi
+    
+    # Add user to each group is not assigned
+    for group in "";
+    do
+        # Check if user is already assiged
+        if id -nG "" | grep -qw "$group"; then
+            true; 
+        else
+            adduser -S "" "$group";
+        fi
+    done
+fi
+
+#
+# Configurations
+#
 for config_script in /usr/local/bin/config/*; 
 do
     $config_script 1>/dev/stdout 2>/dev/stderr; 
 done;
 
-echo "### Finished container configuration"
+# End configuration
 echo "ready" > /tmp/container_status
+echo "### Finished container configuration"
 
 exit 0

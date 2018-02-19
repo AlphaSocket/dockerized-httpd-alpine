@@ -9,6 +9,7 @@ mkdir -p ${CONFIG_HTTPD_DOCUMENT_ROOT}
 
 # Create server conf
 echo "### Create server conf..."
+cp $CONFIG_PATHS_TEMPLATES_HTTPD_USER_GROUP $CONFIG_PATHS_CONF_HTTPD_USER_GROUP
 cp $CONFIG_PATHS_TEMPLATES_HTTPD_SERVER $CONFIG_PATHS_CONF_HTTPD_SERVER
 
 # Create Production configurations
