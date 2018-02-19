@@ -98,6 +98,13 @@ setup:
 config:
   # Config env 
   envvars:
+    groups:
+      main:
+        name: 'www-data'
+    users:
+      main: 
+        name: 'www-data'
+        groups: 'www-data'
     httpd:
       servername:
           valueFromParse: $BUILD_NAME
@@ -119,6 +126,7 @@ config:
     paths:
       templates:
         httpd:
+          user_group: /usr/local/templates/05-user-group.conf
           server: /usr/local/templates/10-server.conf
           ssl: /usr/local/templates/10-ssl.conf
           fastcgi: /usr/local/templates/20-fastcgi.conf
@@ -127,6 +135,8 @@ config:
             prd: /usr/local/templates/prd_vhost.conf
       conf:
         httpd:
+          user_group:
+            valueFromParse: ${SETUP_HTTPD_CONF_CONFD}/05-user-group.conf
           server:
             valueFromParse: ${SETUP_HTTPD_CONF_CONFD}/10-server.conf
           ssl:
@@ -143,6 +153,7 @@ config:
 
     - title: "Create server conf"
       commands:
+       - cp $CONFIG_PATHS_TEMPLATES_HTTPD_USER_GROUP $CONFIG_PATHS_CONF_HTTPD_USER_GROUP
        - cp $CONFIG_PATHS_TEMPLATES_HTTPD_SERVER $CONFIG_PATHS_CONF_HTTPD_SERVER
 
     - title: "Create Production configurations"
