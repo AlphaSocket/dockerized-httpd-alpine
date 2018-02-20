@@ -35,7 +35,7 @@ fi
 
 # Main user
 if  [ ! -z "$CONFIG_USERS_MAIN_NAME" ] && [ ! -z "$CONFIG_USERS_MAIN_ID" ]; then
-    # Remove user if not exists 
+    # Remove user if exists 
     if id -u "$CONFIG_USERS_MAIN_NAME"; then
         deluser "$CONFIG_USERS_MAIN_NAME";
     fi
@@ -45,12 +45,12 @@ fi
 
 # Add additional user
 if [ ! -z "$CONFIG_USERS_ADDITIONAL_NAME" ] && [ ! -z "$CONFIG_USERS_ADDITIONALs_ID" ]; then
-    # Remove user if not exists 
+    # Remove user if exists 
     if id -u "$CONFIG_USERS_ADDITIONAL_NAME"; then
         deluser "$CONFIG_USERS_ADDITIONAL_NAME";
     fi
     # Add user specifing id and groups
-    adduser -u $CONFIG_USERS_ADDITIONAL_ID -S "$CONFIG_USERS_ADDITIONAL_NAME" -G $CONFIG_USERS_ADDITIONAL_NAME;
+    adduser -u $CONFIG_USERS_ADDITIONAL_ID -S "$CONFIG_USERS_ADDITIONAL_NAME" -G $CONFIG_USERS_ADDITIONAL_GROUPS;
 fi
 
 #
