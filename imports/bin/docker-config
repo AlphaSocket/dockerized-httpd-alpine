@@ -23,7 +23,7 @@ set -x
 if [ ! -z "$CONFIG_GROUPS_MAIN_NAME" ] && [ ! -z "$CONFIG_GROUPS_MAIN_ID" ]; then
     if getent group "$CONFIG_GROUPS_MAIN_NAME"; then
         # Remove users in group
-        users=$( getent group "$CONFIG_GROUPS_MAIN_NAME" | cut -d : -n 4 | sed 's/,/ /g' )
+        users=$( getent group "$CONFIG_GROUPS_MAIN_NAME" | cut -d \: -f 4 | sed 's/,/ /g' )
         for user in $users; do deluser "$user"; done
         # Remove group
         delgroup "$CONFIG_GROUPS_MAIN_NAME";
@@ -35,7 +35,7 @@ fi
 if [ ! -z "$CONFIG_GROUPS_ADDITIONAL_NAME" ] && [ ! -z "$CONFIG_GROUPS_ADDITIONAL_ID" ]; then
     if getent group "$CONFIG_GROUPS_ADDITIONAL_NAME"; then
         # Remove users in group
-        users=$( getent group "$CONFIG_GROUPS_ADDITIONAL_NAME" | cut -d : -n 4 | sed 's/,/ /g' )
+        users=$( getent group "$CONFIG_GROUPS_ADDITIONAL_NAME" | cut -d \: -f 4 | sed 's/,/ /g' )
         for user in $users; do deluser "$user"; done
         # Remove group
         delgroup "$CONFIG_GROUPS_ADDITIONAL_NAME";
