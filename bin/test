@@ -32,7 +32,7 @@ echo "#\n# Running test\n#\n"
 # Starting httpd container
 echo "### Starting httpd container..."
 CURDIR=$(pwd)
-TEST_HTTPD_CONTAINER_ID=$( docker run -d --name=httpd-alpine -e CONFIG_PHP_FPM_HOST=127.0.0.1 -v ${CURDIR}/volumes/test_webroot:/var/www/html -p 30942:80 03192859189254/httpd-alpine:latest-dev )
+TEST_HTTPD_CONTAINER_ID=$( docker run -d --name=httpd-alpine -e CONFIG_PHP_FPM_HOST=127.0.0.1 -v ${CURDIR}/volumes/test_webroot:/var/www/html -p 30893:80 03192859189254/httpd-alpine:latest-dev )
 sleep 1
 TEST_HTTPD_CONTAINER_STATUS=$(docker inspect -f '{{.State.Running}}' $TEST_HTTPD_CONTAINER_ID)
 
@@ -62,7 +62,7 @@ fi
 # Testing httpd
 echo "### Testing httpd..."
 sleep 1
-HTTP_CODE=$( curl -sLI 127.0.0.1:30942/index.html -o /dev/null -w '%{http_code}\n' )
+HTTP_CODE=$( curl -sLI 127.0.0.1:30893/index.html -o /dev/null -w '%{http_code}\n' )
 
 # Checking exit code
 echo "### Checking exit code..."
@@ -74,12 +74,12 @@ fi
 # Testing PHP service
 echo "### Testing PHP service..."
 if [ "True" = "True" ]; then
-    CONDITION="curl -sf 127.0.0.1:30942/index.php --max-time 1 -o /dev/null";
+    CONDITION="curl -sf 127.0.0.1:30893/index.php --max-time 1 -o /dev/null";
     MAX_TRIES=300;
     SECONDS_BETWEEN_TRIES=1;
     c=0;
     while ! eval "$CONDITION"; do if [ $c -ge ${MAX_TRIES} ]; then exit 1; else c=$(($c + 1)); fi; echo "Try $c failed"; sleep ${SECONDS_BETWEEN_TRIES}; done;
-    HTTP_CONTENT=$(curl -s 127.0.0.1:30942/index.php);
+    HTTP_CONTENT=$(curl -s 127.0.0.1:30893/index.php);
     PHP_TEST=$( echo "$HTTP_CONTENT" | grep -q "http://www.php.net/" && echo "Success");
 fi
 # Check PHP test
