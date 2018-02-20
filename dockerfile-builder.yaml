@@ -100,9 +100,11 @@ config:
   envvars:
     groups:
       main:
+        id: 1082
         name: 'www-data'
     users:
       main: 
+        id: 1082
         name: 'www-data'
         groups: 'www-data'
     httpd:
