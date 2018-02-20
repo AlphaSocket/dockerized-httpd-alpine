@@ -78,8 +78,8 @@ ADD imports/bin/docker-config /usr/local/bin/docker-config
 ADD imports/bin/docker-run /usr/local/bin/docker-run
 ADD imports/bin/docker-rediness-test /usr/local/bin/docker-rediness-test
 ADD imports/bin/docker-liveness-test /usr/local/bin/docker-liveness-test
-ADD imports/bin/setup /usr/local/bin/setup/1519090720
-ADD imports/bin/config /usr/local/bin/config/1519090720
+ADD imports/bin/setup /usr/local/bin/setup/1519092230
+ADD imports/bin/config /usr/local/bin/config/1519092230
 ADD imports/templates/05-user-group.conf /usr/local/templates/05-user-group.conf
 ADD imports/templates/10-ssl.conf /usr/local/templates/10-ssl.conf
 ADD imports/templates/20-fastcgi.conf /usr/local/templates/20-fastcgi.conf
@@ -90,7 +90,7 @@ ADD imports/templates/dev_vhost.conf /usr/local/templates/dev_vhost.conf
 
 RUN chmod +x -R /usr/local/bin && \
     sync && \
-    /usr/local/bin/setup/1519090720 1>/dev/stdout 2>/dev/stderr
+    /usr/local/bin/setup/1519092230 1>/dev/stdout 2>/dev/stderr
 
 EXPOSE 80 
 
