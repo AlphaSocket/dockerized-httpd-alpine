@@ -21,16 +21,18 @@ set -x
 
 # Add main group
 if [ ! -z "$CONFIG_GROUPS_MAIN_NAME" ] && [ ! -z "$CONFIG_GROUPS_MAIN_ID" ]; then
-    if ! getent group "$CONFIG_GROUPS_MAIN_NAME"; then
-        addgroup -g $CONFIG_GROUPS_MAIN_ID -S "$CONFIG_GROUPS_MAIN_NAME";
+    if getent group "$CONFIG_GROUPS_MAIN_NAME"; then
+        delgroup "$CONFIG_GROUPS_MAIN_NAME";
     fi
+    addgroup -g $CONFIG_GROUPS_MAIN_ID -S "$CONFIG_GROUPS_MAIN_NAME";
 fi
 
 # Add additional group
 if [ ! -z "$CONFIG_GROUPS_ADDITIONAL_NAME" ] && [ ! -z "$CONFIG_GROUPS_ADDITIONAL_ID" ]; then
-    if ! getent group "$CONFIG_GROUPS_ADDITIONAL_NAME"; then
-        addgroup -g $CONFIG_GROUPS_ADDITIONAL_ID -S "$CONFIG_GROUPS_ADDITIONAL_NAME";
+    if getent group "$CONFIG_GROUPS_ADDITIONAL_NAME"; then
+        delgroup "$CONFIG_GROUPS_ADDITIONAL_NAME";
     fi
+    addgroup -g $CONFIG_GROUPS_ADDITIONAL_ID -S "$CONFIG_GROUPS_ADDITIONAL_NAME";
 fi
 
 # Main user
