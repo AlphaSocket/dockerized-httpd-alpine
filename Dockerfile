@@ -42,10 +42,14 @@ ENV \
 	SETUP_PHP_FPM="True" \
 	CONFIG_REDINESS_TEST="true" \
 	CONFIG_LIVENESS_TEST="true" \
+	CONFIG_GROUPS_ADDITIONAL_ID="1001" \
 	CONFIG_GROUPS_ADDITIONAL_NAME="" \
+	CONFIG_GROUPS_MAIN_ID="1000" \
 	CONFIG_GROUPS_MAIN_NAME="www-data" \
+	CONFIG_USERS_ADDITIONAL_ID="1001" \
 	CONFIG_USERS_ADDITIONAL_NAME="" \
 	CONFIG_USERS_ADDITIONAL_GROUPS="" \
+	CONFIG_USERS_MAIN_ID="1000" \
 	CONFIG_USERS_MAIN_NAME="www-data" \
 	CONFIG_USERS_MAIN_GROUPS="www-data" \
 	CONFIG_HTTPD_SERVERNAME="httpd-alpine" \
@@ -74,8 +78,8 @@ ADD imports/bin/docker-config /usr/local/bin/docker-config
 ADD imports/bin/docker-run /usr/local/bin/docker-run
 ADD imports/bin/docker-rediness-test /usr/local/bin/docker-rediness-test
 ADD imports/bin/docker-liveness-test /usr/local/bin/docker-liveness-test
-ADD imports/bin/setup /usr/local/bin/setup/1519077091
-ADD imports/bin/config /usr/local/bin/config/1519077091
+ADD imports/bin/setup /usr/local/bin/setup/1519090720
+ADD imports/bin/config /usr/local/bin/config/1519090720
 ADD imports/templates/05-user-group.conf /usr/local/templates/05-user-group.conf
 ADD imports/templates/10-ssl.conf /usr/local/templates/10-ssl.conf
 ADD imports/templates/20-fastcgi.conf /usr/local/templates/20-fastcgi.conf
@@ -86,7 +90,7 @@ ADD imports/templates/dev_vhost.conf /usr/local/templates/dev_vhost.conf
 
 RUN chmod +x -R /usr/local/bin && \
     sync && \
-    /usr/local/bin/setup/1519077091 1>/dev/stdout 2>/dev/stderr
+    /usr/local/bin/setup/1519090720 1>/dev/stdout 2>/dev/stderr
 
 EXPOSE 80 
 

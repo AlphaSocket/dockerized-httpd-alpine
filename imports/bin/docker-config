@@ -20,37 +20,37 @@ echo "running_config" > /tmp/container_status
 set -x
 
 # Add main group
-if [ ! -z "$CONFIG_GROUPS_MAIN_NAME" ]; then
+if [ ! -z "$CONFIG_GROUPS_MAIN_NAME" ] && [ ! -z "$CONFIG_GROUPS_MAIN_ID" ]; then
     if ! getent group "$CONFIG_GROUPS_MAIN_NAME"; then
-        addgroup -S "$CONFIG_GROUPS_MAIN_NAME";
+        addgroup -g $CONFIG_GROUPS_MAIN_ID -S "$CONFIG_GROUPS_MAIN_NAME";
     fi
 fi
 
 # Add additional group
-if [ ! -z "$CONFIG_GROUPS_ADDITIONAL_NAME" ] ; then
+if [ ! -z "$CONFIG_GROUPS_ADDITIONAL_NAME" ] && [ ! -z "$CONFIG_GROUPS_ADDITIONAL_ID" ]; then
     if ! getent group "$CONFIG_GROUPS_ADDITIONAL_NAME"; then
-        addgroup -S "$CONFIG_GROUPS_ADDITIONAL_NAME";
+        addgroup -g $CONFIG_GROUPS_ADDITIONAL_ID -S "$CONFIG_GROUPS_ADDITIONAL_NAME";
     fi
 fi
 
 # Main user
-if [ ! -z "$CONFIG_USERS_MAIN_NAME" ]; then
+if  [ ! -z "$CONFIG_USERS_MAIN_NAME" ] && [ ! -z "$CONFIG_USERS_MAIN_ID" ]; then
     # Remove user if not exists 
     if id -u "$CONFIG_USERS_MAIN_NAME"; then
         deluser "$CONFIG_USERS_MAIN_NAME";
     fi
     # Add user specifing groups
-    adduser -S "$CONFIG_USERS_MAIN_NAME" -G $CONFIG_USERS_MAIN_GROUPS;
+    adduser -u $CONFIG_USERS_MAIN_ID -S "$CONFIG_USERS_MAIN_NAME" -G $CONFIG_USERS_MAIN_GROUPS;
 fi
 
 # Add additional user
-if [ ! -z "$CONFIG_USERS_ADDITIONAL_NAME" ]; then
+if [ ! -z "$CONFIG_USERS_ADDITIONAL_NAME" ] && [ ! -z "$CONFIG_USERS_ADDITIONALs_ID" ]; then
     # Remove user if not exists 
     if id -u "$CONFIG_USERS_ADDITIONAL_NAME"; then
         deluser "$CONFIG_USERS_ADDITIONAL_NAME";
     fi
-    # Add user specifing groups
-    adduser -S "$CONFIG_USERS_ADDITIONAL_NAME" -G $CONFIG_USERS_ADDITIONAL_NAME;
+    # Add user specifing id and groups
+    adduser -u $CONFIG_USERS_ADDITIONAL_ID -S "$CONFIG_USERS_ADDITIONAL_NAME" -G $CONFIG_USERS_ADDITIONAL_NAME;
 fi
 
 #
