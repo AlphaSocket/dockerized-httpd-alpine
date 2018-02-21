@@ -41,9 +41,6 @@ build:
 setup:
   # Setup env 
   envvars:
-    dependencies:
-      setup: ""
-      config: ""
     httpd:
       conf:
         path: /usr/local/apache2/conf
@@ -57,11 +54,7 @@ setup:
       fpm: True
   # Setup Processes
   processes:
-    - title: "Install dependencies"
-      shell_condition: '! "$SETUP_DEPENDENCIES_CONFIG$SETUP_DEPENDENCIES_SETUP" = ""'
-      commands: 
-        - "apk add --no-cache $SETUP_DEPENDENCIES_CONFIG $SETUP_DEPENDENCIES_SETUP"
-
+    
     - title: "Enable required modules"
       commands:
         # Enable rewrite_module

@@ -1,14 +1,11 @@
 #!/bin/sh
-#
-
-# exit if a command fails
 set -e
 
-# Install dependencies
-echo "### Install dependencies..."
-if [ ! "$SETUP_DEPENDENCIES_CONFIG$SETUP_DEPENDENCIES_SETUP" = "" ]; then
-    apk add --no-cache $SETUP_DEPENDENCIES_CONFIG $SETUP_DEPENDENCIES_SETUP;
-fi
+# Install all dependencies
+echo "### Install all dependencies..."
+apk add --no-cache $BUILDER_DEPENDENCIES $SETUP_DEPENDENCIES_SETUP $SETUP_DEPENDENCIES_CONFIG $SETUP_DEPENDENCIES_RUNTIME
+
+
 # Enable required modules
 echo "### Enable required modules..."
 sed -i '/LoadModule.*rewrite_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN
@@ -32,6 +29,7 @@ if [ "$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE" ]; then
     sed -i '/LoadModule.*proxy_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN;
     sed -i '/LoadModule.*proxy_fcgi_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN;
 fi
+
 
 
 exit 0
