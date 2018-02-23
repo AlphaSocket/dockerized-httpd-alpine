@@ -121,7 +121,6 @@ config:
     paths:
       templates:
         httpd:
-          user_group: /usr/local/templates/05-user-group.conf
           server: /usr/local/templates/10-server.conf
           ssl: /usr/local/templates/10-ssl.conf
           fastcgi: /usr/local/templates/20-fastcgi.conf
@@ -130,8 +129,6 @@ config:
             prd: /usr/local/templates/prd_vhost.conf
       conf:
         httpd:
-          user_group:
-            valueFromParse: ${SETUP_HTTPD_CONF_CONFD}/05-user-group.conf
           server:
             valueFromParse: ${SETUP_HTTPD_CONF_CONFD}/10-server.conf
           ssl:
@@ -148,8 +145,9 @@ config:
 
     - title: "Create server conf"
       commands:
-       - envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_USER_GROUP" > "$CONFIG_PATHS_CONF_HTTPD_USER_GROUP"
-       - envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_SERVER" > "$CONFIG_PATHS_CONF_HTTPD_SERVER"
+        - sed -i 's/User daemon/User ${CONFIG_USERS_MAIN_NAME}/g' "$SETUP_HTTPD_CONF_MAIN"
+        - sed -i 's/Group daemon/Group ${CONFIG_GROUPS_MAIN_NAME}/g' $SETUP_HTTPD_CONF_MAIN
+        - envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_SERVER" > "$CONFIG_PATHS_CONF_HTTPD_SERVER"
 
     - title: "Create Production configurations"
       shell_condition: '"$BUILD_ENV" = "$GENERAL_KEYS_PRD"'
