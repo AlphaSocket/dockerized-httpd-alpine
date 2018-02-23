@@ -9,18 +9,18 @@ mkdir -p ${CONFIG_HTTPD_DOCUMENT_ROOT}
 
 # Create server conf
 echo "### Create server conf..."
-envsubsts < "$CONFIG_PATHS_TEMPLATES_HTTPD_USER_GROUP" > "$CONFIG_PATHS_CONF_HTTPD_USER_GROUP"
-envsubsts < "$CONFIG_PATHS_TEMPLATES_HTTPD_SERVER" > "$CONFIG_PATHS_CONF_HTTPD_SERVER"
+envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_USER_GROUP" > "$CONFIG_PATHS_CONF_HTTPD_USER_GROUP"
+envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_SERVER" > "$CONFIG_PATHS_CONF_HTTPD_SERVER"
 
 # Create Production configurations
 echo "### Create Production configurations..."
 if [ "$BUILD_ENV" = "$GENERAL_KEYS_PRD" ]; then
-    envsubsts < "$CONFIG_PATHS_TEMPLATES_HTTPD_SSL" > "$CONFIG_PATHS_CONF_HTTPD_SSL";
+    envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_SSL" > "$CONFIG_PATHS_CONF_HTTPD_SSL";
 fi
 # Create fastcgi conf
 echo "### Create fastcgi conf..."
 if [ "$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE" ]; then
-    envsubsts < "$CONFIG_PATHS_TEMPLATES_HTTPD_FASTCGI" > "$CONFIG_PATHS_CONF_HTTPD_FASTCGI";
+    envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_FASTCGI" > "$CONFIG_PATHS_CONF_HTTPD_FASTCGI";
 fi
 # Set vhost template
 echo "### Set vhost template..."
@@ -31,7 +31,7 @@ else
 fi
 # Create vhost conf
 echo "### Create vhost conf..."
-envsubsts < "$VHOST_TEMPLATE" > "$CONFIG_PATHS_CONF_HTTPD_VHOST"
+envsubst < "$VHOST_TEMPLATE" > "$CONFIG_PATHS_CONF_HTTPD_VHOST"
 
 
 
