@@ -30,6 +30,14 @@ if [ "$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE" ]; then
     sed -i '/LoadModule.*proxy_fcgi_module/ s/^#//' $SETUP_HTTPD_CONF_MAIN;
 fi
 
+# Remove unecessary dependencies
+echo "### Remove unecessary dependencies..."
+echo "$SETUP_DEPENDENCIES_SETUP" | tr ' ' "\n" > /tmp/A
+echo "$SETUP_DEPENDENCIES_CONFIG $SETUP_DEPENDENCIES_RUNTIME" | tr ' ' "\n"  > /tmp/B
+UNNECESSARY_DEPENDENDCY_SETUP=$( grep -Fxv -f /tmp/B /tmp/A | xargs )
+rm -f /tmp/A /tmp/B
+apk del --no-cache $UNNECESSARY_DEPENDENDCY_SETUP
+
 
 
 exit 0
