@@ -64,13 +64,11 @@ ENV \
 	CONFIG_PHP_FPM_HOST="php-fpm.service" \
 	CONFIG_PHP_FPM_PORT="9000" \
 	CONFIG_PATHS_CONTAINER_STATUS="/tmp/container_status" \
-	CONFIG_PATHS_TEMPLATES_HTTPD_USER_GROUP="/usr/local/templates/05-user-group.conf" \
 	CONFIG_PATHS_TEMPLATES_HTTPD_SERVER="/usr/local/templates/10-server.conf" \
 	CONFIG_PATHS_TEMPLATES_HTTPD_SSL="/usr/local/templates/10-ssl.conf" \
 	CONFIG_PATHS_TEMPLATES_HTTPD_FASTCGI="/usr/local/templates/20-fastcgi.conf" \
 	CONFIG_PATHS_TEMPLATES_HTTPD_VHOST_DEV="/usr/local/templates/dev_vhost.conf" \
 	CONFIG_PATHS_TEMPLATES_HTTPD_VHOST_PRD="/usr/local/templates/prd_vhost.conf" \
-	CONFIG_PATHS_CONF_HTTPD_USER_GROUP="/usr/local/apache2/conf/conf.d/05-user-group.conf" \
 	CONFIG_PATHS_CONF_HTTPD_SERVER="/usr/local/apache2/conf/conf.d/10-server.conf" \
 	CONFIG_PATHS_CONF_HTTPD_SSL="/usr/local/apache2/conf/conf.d/10-ssl.conf" \
 	CONFIG_PATHS_CONF_HTTPD_FASTCGI="/usr/local/apache2/conf/conf.d/20-fastcgi.conf" \
@@ -79,9 +77,8 @@ ADD imports/bin/docker-config /usr/local/bin/docker-config
 ADD imports/bin/docker-run /usr/local/bin/docker-run
 ADD imports/bin/docker-rediness-test /usr/local/bin/docker-rediness-test
 ADD imports/bin/docker-liveness-test /usr/local/bin/docker-liveness-test
-ADD imports/bin/setup /usr/local/bin/setup/1519350736
-ADD imports/bin/config /usr/local/bin/config/1519350736
-ADD imports/templates/05-user-group.conf /usr/local/templates/05-user-group.conf
+ADD imports/bin/setup /usr/local/bin/setup/1519351449
+ADD imports/bin/config /usr/local/bin/config/1519351449
 ADD imports/templates/10-ssl.conf /usr/local/templates/10-ssl.conf
 ADD imports/templates/20-fastcgi.conf /usr/local/templates/20-fastcgi.conf
 ADD imports/templates/prd_vhost.conf /usr/local/templates/prd_vhost.conf
@@ -91,7 +88,7 @@ ADD imports/templates/dev_vhost.conf /usr/local/templates/dev_vhost.conf
 
 RUN chmod +x -R /usr/local/bin && \
     sync && \
-    /usr/local/bin/setup/1519350736 1>/dev/stdout 2>/dev/stderr
+    /usr/local/bin/setup/1519351449 1>/dev/stdout 2>/dev/stderr
 
 EXPOSE 80 
 

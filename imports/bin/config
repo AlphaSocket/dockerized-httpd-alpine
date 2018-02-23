@@ -9,7 +9,8 @@ mkdir -p ${CONFIG_HTTPD_DOCUMENT_ROOT}
 
 # Create server conf
 echo "### Create server conf..."
-envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_USER_GROUP" > "$CONFIG_PATHS_CONF_HTTPD_USER_GROUP"
+sed -i 's/User daemon/User ${CONFIG_USERS_MAIN_NAME}/g' "$SETUP_HTTPD_CONF_MAIN"
+sed -i 's/Group daemon/Group ${CONFIG_GROUPS_MAIN_NAME}/g' $SETUP_HTTPD_CONF_MAIN
 envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_SERVER" > "$CONFIG_PATHS_CONF_HTTPD_SERVER"
 
 # Create Production configurations
