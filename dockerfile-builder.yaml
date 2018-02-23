@@ -148,14 +148,14 @@ config:
 
     - title: "Create server conf"
       commands:
-       - cp $CONFIG_PATHS_TEMPLATES_HTTPD_USER_GROUP $CONFIG_PATHS_CONF_HTTPD_USER_GROUP
-       - cp $CONFIG_PATHS_TEMPLATES_HTTPD_SERVER $CONFIG_PATHS_CONF_HTTPD_SERVER
+       - envsubsts < "$CONFIG_PATHS_TEMPLATES_HTTPD_USER_GROUP" > "$CONFIG_PATHS_CONF_HTTPD_USER_GROUP"
+       - envsubsts < "$CONFIG_PATHS_TEMPLATES_HTTPD_SERVER" > "$CONFIG_PATHS_CONF_HTTPD_SERVER"
 
     - title: "Create Production configurations"
       shell_condition: '"$BUILD_ENV" = "$GENERAL_KEYS_PRD"'
       commands:
         # Enable ssl_module
-       - cp $CONFIG_PATHS_TEMPLATES_HTTPD_SSL $CONFIG_PATHS_CONF_HTTPD_SSL
+       - envsubsts < "$CONFIG_PATHS_TEMPLATES_HTTPD_SSL" > "$CONFIG_PATHS_CONF_HTTPD_SSL"
 
     - title: "Create fastcgi conf"
       shell_condition: '"$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE"'
@@ -166,21 +166,19 @@ config:
        #- sed -i -e 's/<PHP_FPM_PORT>/'$CONFIG_PHP_FPM_PORT'/g' $HTTPD_FAST_CGI_CONF_PATH
        #- sed -i -e 's/<PHP_PROXY_REGEX>/'${CONFIG_PHP_PROXY_REGEX}'/g' $HTTPD_FAST_CGI_CONF_PATH
        #- sed -i -e 's/<PHP_PROXY_TIMEOUT>/'${CONFIG_PHP_PROXY_TIMEOUT}'/g' $HTTPD_FAST_CGI_CONF_PATH
-       - cp $CONFIG_PATHS_TEMPLATES_HTTPD_FASTCGI $CONFIG_PATHS_CONF_HTTPD_FASTCGI
+       - envsubsts < "$CONFIG_PATHS_TEMPLATES_HTTPD_FASTCGI" > "$CONFIG_PATHS_CONF_HTTPD_FASTCGI"
 
     - title: "Set vhost template"
-      commands:
-        - VHOST_TEMPLATE=$CONFIG_PATHS_TEMPLATES_HTTPD_VHOST_PRD
-    
-    - title: "Override vhost template if dev"
       shell_condition: '"$BUILD_ENV" = "$GENERAL_KEYS_DEV"'
       commands:
         - VHOST_TEMPLATE=$CONFIG_PATHS_TEMPLATES_HTTPD_VHOST_DEV
+      else:
+        - VHOST_TEMPLATE=$CONFIG_PATHS_TEMPLATES_HTTPD_VHOST_PRD
 
     - title: "Create vhost conf"
       commands:
         # Create vhost
-        - cp $VHOST_TEMPLATE $CONFIG_PATHS_CONF_HTTPD_VHOST
+        - envsubsts < "$VHOST_TEMPLATE" > "$CONFIG_PATHS_CONF_HTTPD_VHOST"
 
 test:
   processes:
