@@ -142,18 +142,18 @@ config:
     - title: "Make sure webroot exists"
       commands:
         - "mkdir -p ${CONFIG_HTTPD_DOCUMENT_ROOT}"
-
+  
     - title: "Create server conf"
       commands:
         - sed -i 's/User daemon/User ${CONFIG_USERS_MAIN_NAME}/g' "$SETUP_HTTPD_CONF_MAIN"
         - sed -i 's/Group daemon/Group ${CONFIG_GROUPS_MAIN_NAME}/g' $SETUP_HTTPD_CONF_MAIN
-        - envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_SERVER" > "$CONFIG_PATHS_CONF_HTTPD_SERVER"
+        - cat "$CONFIG_PATHS_TEMPLATES_HTTPD_SERVER" | envsubst > "$CONFIG_PATHS_CONF_HTTPD_SERVER"
 
     - title: "Create Production configurations"
       shell_condition: '"$BUILD_ENV" = "$GENERAL_KEYS_PRD"'
       commands:
         # Enable ssl_module
-       - envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_SSL" > "$CONFIG_PATHS_CONF_HTTPD_SSL"
+       - cat "$CONFIG_PATHS_TEMPLATES_HTTPD_SSL" | envsubst > "$CONFIG_PATHS_CONF_HTTPD_SSL"
 
     - title: "Create fastcgi conf"
       shell_condition: '"$SETUP_PHP_FPM" = "$GENERAL_KEYS_TRUE"'
@@ -164,7 +164,7 @@ config:
        #- sed -i -e 's/<PHP_FPM_PORT>/'$CONFIG_PHP_FPM_PORT'/g' $HTTPD_FAST_CGI_CONF_PATH
        #- sed -i -e 's/<PHP_PROXY_REGEX>/'${CONFIG_PHP_PROXY_REGEX}'/g' $HTTPD_FAST_CGI_CONF_PATH
        #- sed -i -e 's/<PHP_PROXY_TIMEOUT>/'${CONFIG_PHP_PROXY_TIMEOUT}'/g' $HTTPD_FAST_CGI_CONF_PATH
-       - envsubst < "$CONFIG_PATHS_TEMPLATES_HTTPD_FASTCGI" > "$CONFIG_PATHS_CONF_HTTPD_FASTCGI"
+       - cat "$CONFIG_PATHS_TEMPLATES_HTTPD_FASTCGI" | envsubst > "$CONFIG_PATHS_CONF_HTTPD_FASTCGI"
 
     - title: "Set vhost template"
       shell_condition: '"$BUILD_ENV" = "$GENERAL_KEYS_DEV"'
@@ -176,7 +176,7 @@ config:
     - title: "Create vhost conf"
       commands:
         # Create vhost
-        - envsubst < "$VHOST_TEMPLATE" > "$CONFIG_PATHS_CONF_HTTPD_VHOST"
+        - cat "$VHOST_TEMPLATE" | envsubst > "$CONFIG_PATHS_CONF_HTTPD_VHOST"
 
 test:
   processes:
